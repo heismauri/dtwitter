@@ -1,16 +1,16 @@
 <script>    
-    var selector_enable = "";
+    var selector_enable = '';
     var tweet = {twitter_response};
     function getmedialinks(tweet) {
-        if ("errors" in tweet) {
+        if ('errors' in tweet) {
             var message = tweet.errors[0].message.replace('.', '');
             var error_message = {
                 error: message,
             };
             return error_message;
-        } else if (!("extended_entities" in tweet)) {
+        } else if (!('extended_entities' in tweet)) {
             var error_media = {
-                error: "Media not found for inputted URL",
+                error: 'Media not found for inputted URL',
             };
             return error_media;
         }
