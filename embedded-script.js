@@ -1,4 +1,4 @@
-<script type="text/javascript">
+<script>    
     var selector_enable = "";
     var tweet = {twitter_response};
     function getmedialinks(tweet) {
@@ -48,14 +48,13 @@
                 if (media_type === 'photo') {
                     const media_link = media.media_url_https;
                     const extension = media_link.match(/\.[a-z]+$/gi).shift();
-                    const media_link_no_extension = media_link.replace(extension, '');
+                    const main_link = media_link.replace(extension, '');
                     const file_extension = extension.replace('.', '');
-                    const full_res = '4096x4096';
-                    const final_media_link = `${media_link_no_extension}?format=${file_extension}&name=${full_res}`;
+                    const final_media_link = main_link + '?format=' + file_extension + '&name=orig';
                     const return_data_image = {
                         type: media_type,
                         link: final_media_link,
-                    }
+                    };
                     return return_data_image;
                 }
             })
