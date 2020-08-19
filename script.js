@@ -12,7 +12,7 @@ const twitterMedia = async request => {
         }
     });
     // Success!
-    const picker_enable = ourl.searchParams.get('picker');
+    const selector_enable = ourl.searchParams.get('picker');
     const tweet = await resp.json();
     // Getting the media from the available tweet
     function getmedialinks(tweet) {
@@ -34,55 +34,43 @@ const twitterMedia = async request => {
         return tweet.extended_entities.media
             .map(media => {
                 const media_type = media.type;
-                // Video
-                if (media_type === 'video') {
+                // Video Selector
+                if (selector_enable === 'true' && media_type === 'video') {
                     const video = media.video_info.variants.filter(variant => variant.bitrate !== undefined);
-                    // Video quality selector enabled
-                    if (picker_enable === 'true') {
-                        video.sort(function (a, b) {
-                            return a.bitrate - b.bitrate;
-                        });
-                        const return_video_quality = {
-                            low: video[0].url,
-                        };
-                        if (video[1] && video[1].url) return_video_quality.medium = video[1].url;
-                        if (video[2] && video[2].url) return_video_quality.high = video[2].url;
-                        const return_data_picker = {
-                            type: 'picker',
-                            link: return_video_quality,
-                        };
-                        return return_data_picker;
-                    // Video quality selector disabled
-                    } else if (picker_enable === 'false') {
-                        video.sort(function (a, b) {
-                            return b.bitrate - a.bitrate;
-                        });
-                        const return_data_video = {
-                            type: media_type,
-                            link: video[0].url,
-                        };
-                        return return_data_video;
-                    }
-                }
-                // GIF
-                if (media_type === 'animated_gif') {
-                    const gif = media.video_info.variants.filter(variant => variant.content_type == 'video/mp4');
-                    const return_data_gif = {
-                        type: media_type,
-                        width: media.sizes.large.w,
-                        height: media.sizes.large.h,
-                        link: gif[0].url,
+                    video.sort(function (a, b) {
+                        return a.bitrate - b.bitrate;
+                    });
+                    const return_video_quality = {
+                        low: video[0].url,
                     };
-                    return return_data_gif;
+                    if (video[1] && video[1].url) return_video_quality.medium = video[1].url;
+                    if (video[2] && video[2].url) return_video_quality.high = video[2].url;
+                    const return_data_selector = {
+                        type: 'picker',
+                        link: return_video_quality,
+                    };
+                    return return_data_selector;
+                }
+                // Video & GIF
+                if (media_type === 'animated_gif' || media_type === 'video') {
+                    const video_gif = media.video_info.variants.filter(variant => variant.content_type == 'video/mp4');
+                    video_gif.sort(function (a, b) {
+                        return b.bitrate - a.bitrate;
+                    });
+                    const return_data_video_gif = {
+                        type: media_type,
+                        link: video_gif[0].url,
+                    };
+                    if (media_type === 'animated_gif') return_data_video_gif.width = media.sizes.large.w, return_data_video_gif.height = media.sizes.large.h;
+                    return return_data_video_gif;
                 }
                 // Photo
                 if (media_type === 'photo') {
                     const media_link = media.media_url_https;
                     const extension = media_link.match(/\.[a-z]+$/gi).shift();
-                    const media_link_no_extension = media_link.replace(extension, '');
+                    const main_link = media_link.replace(extension, '');
                     const file_extension = extension.replace('.', '');
-                    const full_res = 'orig';
-                    const final_media_link = media_link_no_extension + '?format=' + file_extension + '&name=' + full_res;
+                    const final_media_link = main_link + '?format=' + file_extension + '&name=orig';
                     const return_data_image = {
                         type: media_type,
                         link: final_media_link,
