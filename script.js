@@ -70,7 +70,7 @@ const twitterMedia = async request => {
                     const extension = media_link.match(/\.[a-z]+$/gi).shift();
                     const main_link = media_link.replace(extension, '');
                     const file_extension = extension.replace('.', '');
-                    const final_media_link = main_link + '?format=' + file_extension + '&name=orig';
+                    const final_media_link = main_link + '?format=' + file_extension + '&name=4096x4096';
                     const return_data_image = {
                         type: media_type,
                         link: final_media_link,
