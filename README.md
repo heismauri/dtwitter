@@ -10,3 +10,6 @@ This script is used in the shortcut to process the response of Twitter's API in 
 
 ## Credits
 To [@supermamon](https://routinehub.co/user/supermamon) who made the base script of the shortcut
+
+## Donate
+If you loved this shortcut you can [Buy Me a Coffee](https://www.buymeacoffee.com/heismauri)
