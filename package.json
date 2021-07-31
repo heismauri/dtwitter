@@ -1,0 +1,16 @@
+{
+  "name": "dtwitter",
+  "version": "3.0.3",
+  "description": "Download photos, videos and HQ GIFs from a public tweet",
+  "license": "GPL-3.0",
+  "dependencies": {
+    "chai": "^4.1.0",
+    "eslint": "^5.9.0",
+    "eslint-config-airbnb-base": "^13.1.0",
+    "eslint-plugin-import": "^2.7.0",
+    "mocha": "^5.2.0",
+    "webpack": "^4.25.1",
+    "webpack-cli": "^3.1.2",
+    "webpack-dev-server": "^3.1.10"
+  }
+}

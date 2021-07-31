@@ -1,6 +1,6 @@
->[![Download](https://img.shields.io/badge/release-v3.0.3-blue)](https://routinehub.co/shortcut/6166/)
->[![Download count)](https://img.shields.io/badge/downloads-45k-brightgreen)](https://routinehub.co/shortcut/6166/)
->[![Buy me a Coffee](https://img.shields.io/badge/donate%20on-buymeacoffee-yellow?logo=buymeacoffee)](https://www.buymeacoffee.com/heismauri)
+[![Download](https://img.shields.io/badge/release-v3.0.3-blue)](https://routinehub.co/shortcut/6166/)
+[![Download count)](https://img.shields.io/badge/downloads-45k-brightgreen)](https://routinehub.co/shortcut/6166/)
+[![Buy me a Coffee](https://img.shields.io/badge/donate%20on-buymeacoffee-yellow?logo=buymeacoffee)](https://www.buymeacoffee.com/heismauri)
 
 # DTwitter
 A shortcut available on RoutineHub. Get it [here](https://routinehub.co/shortcut/6166)

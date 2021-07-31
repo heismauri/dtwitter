@@ -1,91 +1,116 @@
-// Connecting to Twitter API 1.1
-addEventListener('fetch', event => {
-    event.respondWith(handleMedia(event.request));
-});
-const twitterMedia = async request => {
-    const ourl = new URL(request.url);
-    const id = ourl.searchParams.get('id');
-    const url = 'https://api.twitter.com/1.1/statuses/show.json?tweet_mode=extended&id=' + id;
-    const resp = await fetch(url, {
-        headers: {
-            Authorization: ('Bearer ' + 'TOKEN')
-        }
-    });
-    // Success!
-    const selector_enable = ourl.searchParams.get('picker');
-    const tweet = await resp.json();
-    // Getting the media from the available tweet
-    function getmedialinks(tweet) {
-        // Private or wrong ID
-        if ('errors' in tweet) {
-            const message = tweet.errors[0].message.replace('.', '');
-            const error_message = {
-                error: message,
-            };
-            return error_message;
-        // Tweet does not have any media
-        } else if (!('extended_entities' in tweet)) {
-            const error_media = {
-                error: 'Media not found for inputted URL',
-            };
-            return error_media;
-        }
-        // Success!
-        return tweet.extended_entities.media
-            .map(media => {
-                const media_type = media.type;
-                // Video Selector
-                if (selector_enable === 'true' && media_type === 'video') {
-                    const video = media.video_info.variants.filter(variant => variant.bitrate !== undefined);
-                    video.sort(function (a, b) {
-                        return a.bitrate - b.bitrate;
-                    });
-                    const return_video_quality = {
-                        low: video[0].url,
-                    };
-                    if (video[1] && video[1].url) return_video_quality.medium = video[1].url;
-                    if (video[2] && video[2].url) return_video_quality.high = video[2].url;
-                    const return_data_selector = {
-                        type: 'picker',
-                        link: return_video_quality,
-                    };
-                    return return_data_selector;
+const TOKEN = '';
+const shortcutId = '6166';
+const htmlResponse = ``; // index.html
+
+// Call the Twitter API 1.1
+const handleRequest = async (request) => {
+  const dtwitterForm = await request.formData();
+  const tweetId = dtwitterForm.get('url').split('/')[5];
+  const installedVersion = dtwitterForm.get('version');
+  const dtwitterApi = `https://api.twitter.com/1.1/statuses/show.json?tweet_mode=extended&id=${tweetId}`;
+  const dtwitterFetch = await fetch(dtwitterApi, {
+    headers: {
+      Authorization: `Bearer ${TOKEN}`,
+    },
+  });
+  const dtwitterJson = await dtwitterFetch.json();
+  // Function to create a new json based on Twitter's response
+  const dtwitter = (json) => {
+    let dtwitterResponse;
+    // Check if installed version is the lastest one
+    const rhVersion = ['3.0.3'];
+    if (!(rhVersion.includes(installedVersion))) {
+      dtwitterResponse = {
+        error: `Download the latest update on https://routinehub.co/shortcut/${shortcutId}/`,
+      };
+    // Check if the tweet has media on it
+    } else if (!('extended_entities' in json)) {
+      dtwitterResponse = {
+        error: 'Media not found for inputted URL',
+      };
+    // Check if the API gave him for any errors
+    } else if ('errors' in json) {
+      dtwitterResponse = {
+        error: json.errors[0].message.replace('.', ''),
+      };
+    // Success
+    } else {
+      dtwitterResponse = {
+        media: json.extended_entities.media
+          .map((media) => {
+            let mediaTweet;
+            const mediaType = media.type;
+            const selectorEnable = JSON.parse(dtwitterForm.get('selector')).selector;
+            // Video & GIFs
+            if (mediaType === 'animated_gif' || mediaType === 'video') {
+              const video = media.video_info.variants.filter((variant) => {
+                return variant.bitrate !== undefined;
+              });
+              video.sort((a, b) => a.bitrate - b.bitrate);
+              // Quality selector
+              if (selectorEnable && mediaType === 'video') {
+                const videoQuality = {
+                  low: video[0].url,
+                };
+                // Append other qualities if available
+                if (video[1] && video[1].url) videoQuality.medium = video[1].url;
+                if (video[2] && video[2].url) videoQuality.high = video[2].url;
+                mediaTweet = {
+                  type: 'selector',
+                  link: videoQuality,
+                };
+              // High resolution video
+              } else {
+                mediaTweet = {
+                  type: mediaType,
+                  link: video[video.length - 1].url,
+                };
+                // Only return sizes for GIFs
+                if (mediaType === 'animated_gif') {
+                  mediaTweet.width = media.sizes.large.w;
+                  mediaTweet.height = media.sizes.large.h;
                 }
-                // Video & GIF
-                if (media_type === 'animated_gif' || media_type === 'video') {
-                    const video_gif = media.video_info.variants.filter(variant => variant.content_type == 'video/mp4');
-                    video_gif.sort(function (a, b) {
-                        return b.bitrate - a.bitrate;
-                    });
-                    const return_data_video_gif = {
-                        type: media_type,
-                        link: video_gif[0].url,
-                    };
-                    if (media_type === 'animated_gif') return_data_video_gif.width = media.sizes.large.w, return_data_video_gif.height = media.sizes.large.h;
-                    return return_data_video_gif;
-                }
-                // Photo
-                if (media_type === 'photo') {
-                    const media_link = media.media_url_https;
-                    const extension = media_link.match(/\.[a-z]+$/gi).shift();
-                    const main_link = media_link.replace(extension, '');
-                    const file_extension = extension.replace('.', '');
-                    const final_media_link = main_link + '?format=' + file_extension + '&name=4096x4096';
-                    const return_data_image = {
-                        type: media_type,
-                        link: final_media_link,
-                    };
-                    return return_data_image;
-                }
-            })
-            .filter(item => !!item);
+              }
+            }
+            // Photos
+            if (mediaType === 'photo') {
+              const extension = media.media_url_https.match(/\.[a-z]+$/gi).shift();
+              const photoLink = media.media_url_https.replace(extension, '');
+              const photoExtension = extension.replace('.', '');
+              const finalPhotoLink = `${photoLink}?format=${photoExtension}&name=orig`;
+              mediaTweet = {
+                type: mediaType,
+                link: finalPhotoLink,
+              };
+            }
+            return mediaTweet;
+          })
+          .filter(item => !!item)
+      };
     }
-    const media_links = getmedialinks(tweet);
-    const media_links_data = {
-        media: media_links,
-    };
-    return new Response(JSON.stringify(media_links_data), { status: 200 });
+    return dtwitterResponse;
+  };
+  // Stringify the JSON response from the dtwitter function
+  return new Response(JSON.stringify(dtwitter(dtwitterJson)), {
+    headers: {
+      'Content-Type': 'application/json; charset=UTF-8',
+    },
+  });
 };
-async function handleMedia(request) {
-    return await twitterMedia(request);
-}
+
+// Workers event listener
+// eslint-disable-next-line
+addEventListener('fetch', (event) => {
+  let response;
+  const { request } = event;
+  if (request.method === 'POST') {
+    response = event.respondWith(handleRequest(event.request));
+  } else if (request.method === 'GET') {
+    response = event.respondWith(new Response(htmlResponse, {
+      headers: {
+        'Content-Type': 'text/html; charset=UTF-8',
+      },
+    }));
+  }
+  return response;
+});
