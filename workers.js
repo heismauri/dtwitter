@@ -8,12 +8,12 @@ const handleRequest = async (request) => {
   const tweetId = dtwitterForm.get('url').split('/')[5];
   const installedVersion = dtwitterForm.get('version');
   const dtwitterApi = `https://api.twitter.com/1.1/statuses/show.json?tweet_mode=extended&id=${tweetId}`;
-  const dtwitterFetch = await fetch(dtwitterApi, {
+  const dtwitterJson = await fetch(dtwitterApi, {
     headers: {
       Authorization: `Bearer ${TOKEN}`,
     },
-  });
-  const dtwitterJson = await dtwitterFetch.json();
+  })
+    .then(response => response.json());
   // Function to create a new json based on Twitter's response
   const dtwitter = (json) => {
     let dtwitterResponse;
@@ -23,15 +23,15 @@ const handleRequest = async (request) => {
       dtwitterResponse = {
         error: `Download the latest update on https://routinehub.co/shortcut/${shortcutId}/`,
       };
+    // Check if the API gave them for any errors
+    } else if ('errors' in json) {
+      dtwitterResponse = {
+        error: json.errors[0].message.replace('.', ''),
+      };
     // Check if the tweet has media on it
     } else if (!('extended_entities' in json)) {
       dtwitterResponse = {
         error: 'Media not found for inputted URL',
-      };
-    // Check if the API gave him for any errors
-    } else if ('errors' in json) {
-      dtwitterResponse = {
-        error: json.errors[0].message.replace('.', ''),
       };
     // Success
     } else {
