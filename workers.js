@@ -13,7 +13,7 @@ const handleRequest = async (request) => {
       Authorization: `Bearer ${TOKEN}`,
     },
   })
-    .then(response => response.json());
+    .then((response) => response.json());
   // Function to create a new json based on Twitter's response
   const dtwitter = (json) => {
     let dtwitterResponse;
@@ -85,7 +85,7 @@ const handleRequest = async (request) => {
             }
             return mediaTweet;
           })
-          .filter(item => !!item)
+          .filter((item) => !!item)
       };
     }
     return dtwitterResponse;
