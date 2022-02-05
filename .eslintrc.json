@@ -1,4 +1,8 @@
 {
+  "env": {
+    "worker": true,
+    "es2021": true
+  },
   "extends": "airbnb-base",
   "rules": {
     "no-console": "off",
@@ -11,9 +15,5 @@
     "import/prefer-default-export": "off",
     "prefer-destructuring": "off",
     "arrow-body-style": "off"
-  },
-  "env": {
-    "node": true,
-    "worker": true
   }
 }
