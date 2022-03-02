@@ -99,7 +99,6 @@ const handleRequest = async (request) => {
 };
 
 // Workers event listener
-// eslint-disable-next-line
 addEventListener('fetch', (event) => {
   let response;
   const { request } = event;

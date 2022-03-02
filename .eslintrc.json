@@ -1,7 +1,6 @@
 {
   "env": {
-    "worker": true,
-    "es2021": true
+    "worker": true
   },
   "extends": "airbnb-base",
   "rules": {
@@ -11,9 +10,7 @@
     "quotes": "off",
     "no-unused-vars": "off",
     "no-param-reassign": "off",
-    "class-methods-use-this": "off",
-    "import/prefer-default-export": "off",
-    "prefer-destructuring": "off",
-    "arrow-body-style": "off"
+    "arrow-body-style": "off",
+    "no-restricted-globals": "off"
   }
 }
