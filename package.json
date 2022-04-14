@@ -17,5 +17,8 @@
     "eslint": "^7.32.0",
     "eslint-config-airbnb-base": "^14.2.1",
     "eslint-plugin-import": "^2.22.1"
+  },
+  "dependencies": {
+    "miniflare": "^2.4.0"
   }
 }
