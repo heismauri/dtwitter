@@ -104,7 +104,7 @@ addEventListener('fetch', (event) => {
   const { request } = event;
   if (request.method === 'POST') {
     response = event.respondWith(handleRequest(event.request));
-  } else if (request.method === 'GET') {
+  } else {
     response = event.respondWith(new Response(htmlResponse, {
       headers: {
         'Content-Type': 'text/html; charset=UTF-8',
