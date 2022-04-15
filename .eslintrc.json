@@ -11,6 +11,7 @@
     "no-unused-vars": "off",
     "no-param-reassign": "off",
     "arrow-body-style": "off",
-    "no-restricted-globals": "off"
+    "no-restricted-globals": "off",
+    "quote-props": "off"
   }
 }
