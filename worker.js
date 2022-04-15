@@ -1,11 +1,10 @@
-const TOKEN = '';
 const shortcutId = '6166';
 const htmlResponse = ``; // index.html
 
 // Call the Twitter API 1.1
 const handleRequest = async (request) => {
   const dtwitterForm = await request.formData();
-  const tweetId = dtwitterForm.get('url').split('/')[5];
+  const tweetId = dtwitterForm.get('url').split('?')[0].split('/')[5];
   const installedVersion = dtwitterForm.get('version');
   const dtwitterApi = `https://api.twitter.com/1.1/statuses/show.json?tweet_mode=extended&id=${tweetId}`;
   const dtwitterJson = await fetch(dtwitterApi, {
@@ -40,7 +39,10 @@ const handleRequest = async (request) => {
           .map((media) => {
             let mediaTweet;
             const mediaType = media.type;
-            const selectorEnable = JSON.parse(dtwitterForm.get('selector')).selector;
+            let selectorEnable = true;
+            if (dtwitterForm.get('selector') !== null) {
+              selectorEnable = JSON.parse(dtwitterForm.get('selector')).selector;
+            }
             // Video & GIFs
             if (mediaType === 'animated_gif' || mediaType === 'video') {
               const video = media.video_info.variants.filter((variant) => {
