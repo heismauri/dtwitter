@@ -17,7 +17,7 @@ const handleRequest = async (request) => {
   const dtwitter = (json) => {
     let dtwitterResponse;
     // Check if installed version is the lastest one
-    const rhVersion = ['3.0.3'];
+    const rhVersion = ['3.0.5'];
     if (!(rhVersion.includes(installedVersion))) {
       dtwitterResponse = {
         error: `Download the latest update on https://routinehub.co/shortcut/${shortcutId}/`,
