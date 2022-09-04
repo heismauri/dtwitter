@@ -1,53 +1,22 @@
 <!DOCTYPE html>
 <html>
-
-<head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta http-equiv="pragma" content="no-cache">
-  <link rel="shortcut icon" href="https://i.imgur.com/JyudcZ0.png">
-  <title>DTwitter API - Cloudflare Workers</title>
-  <meta name="description" content="This API only works with the Siri Shortcut DTwitter which can be downloaded on RoutineHub">
-  <style>
-    html {
-      line-height: 1.5;
-      -webkit-text-size-adjust: 100%;
-    }
-
-    body {
-      padding: 0 20px;
-      margin: 0;
-      text-align: center;
-      background-color: #fff;
-      color: #3c4142;
-      font-family: "SF Pro Text", "SF Pro Icons", "Helvetica Neue", "Helvetica", "Arial", sans-serif;
-    }
-
-    a {
-      color: #00aefe;
-      text-decoration: none;
-      background-color: transparent;
-      transition: 0.3s;
-    }
-
-    a:hover {
-      color: #0d6791;
-    }
-
-    img {
-      border-style: none;
-      max-width: 100%;
-      height: auto;
-      box-shadow: 0 calc(200px / 64) calc(200px / 32) 0 rgba(0, 0, 0, 0.14);
-      border-radius: 52px;
-    }
-  </style>
-</head>
-
-<body>
-  <h1>DTwitter</h1>
-  <img width="200" alt="DTwitter's shortcut icon" srcset="https://i.imgur.com/Nu9KfsM.png 2x, https://i.imgur.com/dMxAru4.png 3x" src="https://i.imgur.com/geMuzgs.png">
-  <p>This API only works with the Siri Shortcut <i>"DTwitter"</i> which can be downloaded <a href="https://routinehub.co/shortcut/6166/">here</a></p>
-</body>
-
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="pragma" content="no-cache">
+    <link rel="shortcut icon" href="https://www.heismauri.com/assets/shortcuts/${shortcutName.toLowerCase()}/favicon.png">
+    <title>${shortcutName} API - heismauri</title>
+    <meta name="description" content="This API only works with the Siri Shortcut ${shortcutName} which can be downloaded on RoutineHub">
+    <link rel="stylesheet" href="https://www.heismauri.com/assets/shortcuts/style.css">
+  </head>
+  <body>
+    <div class="container">
+      <h1 class="text-center margin-x">${shortcutName}</h1>
+      <img class="shortcut-icon" width="200" alt="${shortcutName}'s shortcut icon" srcset="https://www.heismauri.com/assets/shortcuts/${shortcutName.toLowerCase()}/icon-x2.png 2x, https://www.heismauri.com/assets/shortcuts/${shortcutName.toLowerCase()}/icon-x3.png 3x" src="https://www.heismauri.com/assets/shortcuts/${shortcutName.toLowerCase()}/icon.png">
+      <p class="text-center margin-x">This API only works with the Siri Shortcut <i>"${shortcutName}"</i> which can be downloaded <a href="https://routinehub.co/shortcut/${shortcutId}/">here</a></p>
+      <div class="text-center copyright">
+        <a href="https://www.heismauri.com/">www.heismauri.com</a>
+      </div>
+    </div>
+  </body>
 </html>
