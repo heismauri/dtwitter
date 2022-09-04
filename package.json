@@ -12,13 +12,15 @@
   "bugs": {
     "url": "https://github.com/heismauri/dtwitter/issues"
   },
-  "homepage": "https://github.com/heismauri/dtwitter#readme",
-  "devDependencies": {
-    "eslint": "^7.32.0",
-    "eslint-config-airbnb-base": "^14.2.1",
-    "eslint-plugin-import": "^2.22.1"
+  "homepage": "https://dtwitter.heismauri.com",
+  "scripts": {
+    "start": "miniflare worker.js --watch --debug",
+    "curl-test": "curl -d 'version=3.0.7&url=https://twitter.com/KDA_MUSIC/status/1333078270640795649' -H 'Content-Type: application/x-www-form-urlencoded' -X POST 'http://127.0.0.1:8787'"
   },
-  "dependencies": {
-    "miniflare": "^2.4.0"
+  "devDependencies": {
+    "eslint": "7.32.0",
+    "eslint-config-airbnb-base": "14.2.1",
+    "eslint-plugin-import": "2.22.1",
+    "miniflare": "2.7.1"
   }
 }
