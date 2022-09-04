@@ -1,4 +1,5 @@
 const shortcutId = '6166';
+const shortcutName = 'DTwitter';
 const htmlResponse = ``; // index.html
 
 // Call the Twitter API 1.1
@@ -17,7 +18,7 @@ const handleRequest = async (request) => {
   const dtwitter = (json) => {
     let dtwitterResponse;
     // Check if installed version is the lastest one
-    const rhVersion = ['3.0.5'];
+    const rhVersion = ['3.0.6', '3.0.7'];
     if (!(rhVersion.includes(installedVersion))) {
       dtwitterResponse = {
         error: `Download the latest update on https://routinehub.co/shortcut/${shortcutId}/`,
