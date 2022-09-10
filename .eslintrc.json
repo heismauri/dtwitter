@@ -1,21 +1,23 @@
 {
 	"env": {
 		"worker": true,
-    "jest/globals": true
+		"jest/globals": true
 	},
 	"extends": "airbnb-base",
+	"globals": {
+		"TOKEN": "readonly"
+	},
 	"plugins": [
 		"jest"
 	],
 	"rules": {
-		"no-console": "off",
-		"no-alert": "off",
-		"comma-dangle": "off",
-		"quotes": "off",
-		"no-unused-vars": "off",
-		"no-param-reassign": "off",
-		"arrow-body-style": "off",
-		"no-restricted-globals": "off",
-		"quote-props": "off"
-	}
+    "arrow-body-style": "off",
+    "comma-dangle": "off",
+    "no-console": "warn",
+    "no-param-reassign": "off",
+    "no-restricted-globals": "off",
+    "no-unused-vars": "off",
+    "quote-props": ["error", "consistent"],
+    "quotes": ["error", "single"]
+  }
 }
