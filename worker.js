@@ -1,6 +1,7 @@
 const shortcutId = '6166';
 const shortcutName = 'DTwitter';
-const htmlResponse = ``; // index.html
+const supportedVersions = ['3.0.7', '3.0.8'];
+const htmlResponse = ''; // index.html
 
 // Build the response
 const jsonBuilder = (twitterJSON, selectorEnable) => {
@@ -10,9 +11,7 @@ const jsonBuilder = (twitterJSON, selectorEnable) => {
       const mediaType = media.type;
       // Video & GIFs
       if (mediaType === 'animated_gif' || mediaType === 'video') {
-        const video = media.video_info.variants.filter((variant) => {
-          return variant.bitrate !== undefined;
-        });
+        const video = media.video_info.variants.filter((variant) => variant.bitrate !== undefined);
         video.sort((a, b) => a.bitrate - b.bitrate);
         // Quality selector
         if (selectorEnable && mediaType === 'video') {
@@ -61,7 +60,7 @@ const jsonBuilder = (twitterJSON, selectorEnable) => {
 const addHeaders = (body) => {
   return new Response(JSON.stringify(body), {
     headers: {
-      'Content-Type': 'application/json; charset=UTF-8'
+      'Content-Type': 'application/json; charset=UTF-8',
     }
   });
 };
@@ -72,8 +71,7 @@ const handleRequest = async (request) => {
   const dtwitterForm = await request.formData();
   // Check if installed version is the lastest one
   const installedVersion = dtwitterForm.get('version');
-  const routinehubVersion = ['3.0.7', '3.0.8'];
-  if (!(routinehubVersion.includes(installedVersion))) {
+  if (!(supportedVersions.includes(installedVersion))) {
     dtwitterResponse = {
       error: `Download the latest update on https://routinehub.co/shortcut/${shortcutId}/`
     };
