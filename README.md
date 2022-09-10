@@ -1,5 +1,5 @@
-[![Download](https://img.shields.io/badge/release-v3.0.4-blue)](https://routinehub.co/shortcut/6166/)
-[![Download count)](https://img.shields.io/badge/downloads-45k-brightgreen)](https://routinehub.co/shortcut/6166/)
+[![Download](https://img.shields.io/badge/release-v3.0.8-blue)](https://routinehub.co/shortcut/6166/)
+[![Download count)](https://img.shields.io/badge/downloads-51k-brightgreen)](https://routinehub.co/shortcut/6166/)
 [![Ko-fi](https://img.shields.io/badge/donate%20on-ko--fi-red?logo=kofi)](https://ko-fi.com/heismauri)
 
 # DTwitter

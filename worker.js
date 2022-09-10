@@ -72,7 +72,7 @@ const handleRequest = async (request) => {
   const dtwitterForm = await request.formData();
   // Check if installed version is the lastest one
   const installedVersion = dtwitterForm.get('version');
-  const routinehubVersion = ['3.0.6', '3.0.7'];
+  const routinehubVersion = ['3.0.7', '3.0.8'];
   if (!(routinehubVersion.includes(installedVersion))) {
     dtwitterResponse = {
       error: `Download the latest update on https://routinehub.co/shortcut/${shortcutId}/`
