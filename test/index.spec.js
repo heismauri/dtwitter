@@ -16,6 +16,20 @@ test('Can download videos', async () => {
   expect(responseJSON.media[0].link).toMatch(/video.twimg.com/);
 });
 
+test('Can download videos with quality selector', async () => {
+  const form = new FormData();
+  form.append('version', LatestVersion);
+  form.append('url', 'https://twitter.com/KDA_MUSIC/status/1333078270640795649');
+  form.append('selector', '{"selector":true}');
+  const requestAPI = await fetch('http://localhost:8787', {
+    method: 'POST',
+    body: form
+  });
+  const responseJSON = await requestAPI.json();
+  expect(responseJSON.media[0].type).toBe('selector');
+  expect(responseJSON.media[0].link.high).toMatch(/video.twimg.com/);
+});
+
 test('Can download GIFs', async () => {
   const form = new FormData();
   form.append('version', LatestVersion);
