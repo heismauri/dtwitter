@@ -1,3 +1,4 @@
+/* eslint-disable */
 var tweet = tweet
 var media_urls = []
 
