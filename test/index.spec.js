@@ -7,13 +7,14 @@ test('Can download videos', async () => {
   const form = new FormData();
   form.append('version', LatestVersion);
   form.append('url', 'https://twitter.com/KDA_MUSIC/status/1333078270640795649');
+  form.append('selector', '{"selector":false}');
   const requestAPI = await fetch('http://localhost:8787', {
     method: 'POST',
     body: form
-  });
-  const responseJSON = await requestAPI.json();
-  expect(responseJSON.media[0].type).toBe('video');
-  expect(responseJSON.media[0].link).toMatch(/video.twimg.com/);
+  })
+    .then((response) => response.json());
+  expect(requestAPI.media[0].type).toBe('video');
+  expect(requestAPI.media[0].link).toMatch(/video.twimg.com/);
 });
 
 test('Can download videos with quality selector', async () => {
@@ -24,10 +25,10 @@ test('Can download videos with quality selector', async () => {
   const requestAPI = await fetch('http://localhost:8787', {
     method: 'POST',
     body: form
-  });
-  const responseJSON = await requestAPI.json();
-  expect(responseJSON.media[0].type).toBe('selector');
-  expect(responseJSON.media[0].link.high).toMatch(/video.twimg.com/);
+  })
+    .then((response) => response.json());
+  expect(requestAPI.media[0].type).toBe('selector');
+  expect(requestAPI.media[0].link.high).toMatch(/video.twimg.com/);
 });
 
 test('Can download GIFs', async () => {
@@ -37,12 +38,12 @@ test('Can download GIFs', async () => {
   const requestAPI = await fetch('http://localhost:8787', {
     method: 'POST',
     body: form
-  });
-  const responseJSON = await requestAPI.json();
-  expect(responseJSON.media[0].type).toBe('animated_gif');
-  expect(responseJSON.media[0].link).toMatch(/video.twimg.com/);
-  expect(typeof responseJSON.media[0].width).toBe('number');
-  expect(typeof responseJSON.media[0].height).toBe('number');
+  })
+    .then((response) => response.json());
+  expect(requestAPI.media[0].type).toBe('animated_gif');
+  expect(requestAPI.media[0].link).toMatch(/video.twimg.com/);
+  expect(typeof requestAPI.media[0].width).toBe('number');
+  expect(typeof requestAPI.media[0].height).toBe('number');
 });
 
 test('Can download photos', async () => {
@@ -52,8 +53,8 @@ test('Can download photos', async () => {
   const requestAPI = await fetch('http://localhost:8787', {
     method: 'POST',
     body: form
-  });
-  const responseJSON = await requestAPI.json();
-  expect(responseJSON.media[0].type).toBe('photo');
-  expect(responseJSON.media[0].link).toMatch(/pbs.twimg.com/);
+  })
+    .then((response) => response.json());
+  expect(requestAPI.media[0].type).toBe('photo');
+  expect(requestAPI.media[0].link).toMatch(/pbs.twimg.com/);
 });
