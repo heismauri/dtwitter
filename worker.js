@@ -1,7 +1,7 @@
 const shortcutId = '6166';
 const shortcutName = 'DTwitter';
 const supportedVersions = ['3.0.8'];
-const landingPage = '';// index.html
+const landingPage = ''; // index.html
 
 // return Response with its corresponding Content-Type
 const addHeaders = (body) => {
@@ -10,36 +10,6 @@ const addHeaders = (body) => {
       'Content-Type': 'application/json; charset=UTF-8'
     }
   });
-};
-
-// Check params
-const paramsBuilder = (form) => {
-  const cleanParams = {};
-  // Check if installed version is the lastest one
-  const installedVersion = form.get('version') && form.get('version');
-  if (!installedVersion || !supportedVersions.includes(installedVersion)) {
-    cleanParams.message = `Download the latest update on https://routinehub.co/shortcut/${shortcutId}/`;
-    return cleanParams;
-  }
-  cleanParams.version = installedVersion;
-  // Check for valid URL
-  const tweetURL = form.get('url') && form.get('url').split('?')[0];
-  if (!tweetURL || !tweetURL.includes('twitter.com')) {
-    cleanParams.message = `URL not supported by ${shortcutName}`;
-    return cleanParams;
-  }
-  // Check for valid tweet ID
-  const tweetID = tweetURL.split('?')[0].split('/')[5];
-  if (!tweetID || !/\d{8,}/.test(tweetID)) {
-    cleanParams.message = 'The Tweet URL contains invalid parameters';
-    return cleanParams;
-  }
-  cleanParams.id = tweetID;
-  const selector = form.get('selector') && JSON.parse(form.get('selector')).selector;
-  if (selector) {
-    cleanParams.selector = selector;
-  }
-  return cleanParams;
 };
 
 // Build the response
@@ -95,11 +65,37 @@ const jsonBuilder = (json, isSelectorEnabled) => {
   return dtwitterJSON;
 };
 
+// Check params
+const paramsBuilder = (object) => {
+  // Check if installed version is the lastest one
+  if (!object.version || !supportedVersions.includes(object.version)) {
+    object.message = `Download the latest update on https://routinehub.co/shortcut/${shortcutId}/`;
+    return object;
+  }
+  // Check for valid URL
+  if (!object.url || !object.url.includes('twitter.com')) {
+    object.message = `URL not supported by ${shortcutName}`;
+    return object;
+  }
+  // Check for valid tweet ID
+  const tweetID = object.url.split('?')[0].split('/')[5];
+  if (!tweetID || !/\d{8,}/.test(tweetID)) {
+    object.message = 'The Tweet URL contains invalid parameters';
+    return object;
+  }
+  object.id = tweetID;
+  if (object.selector) {
+    object.selector = JSON.parse(object.selector).selector;
+  }
+  return object;
+};
+
 // Call the Twitter API 1.1
 const handleRequest = async (request) => {
   if (request.method === 'POST') {
     let dtwitterResponse;
-    const params = paramsBuilder(await request.formData());
+    const objectForm = Object.fromEntries(await request.formData());
+    const params = paramsBuilder(objectForm);
     if (params.message) {
       dtwitterResponse = {
         error: params.message
