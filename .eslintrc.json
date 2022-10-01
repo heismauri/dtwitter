@@ -1,16 +1,16 @@
 {
-	"env": {
-		"worker": true,
-		"jest/globals": true
-	},
-	"extends": "airbnb-base",
-	"globals": {
-		"TOKEN": "readonly"
-	},
-	"plugins": [
-		"jest"
-	],
-	"rules": {
+  "env": {
+    "worker": true,
+    "jest/globals": true
+  },
+  "extends": "airbnb-base",
+  "globals": {
+    "TOKEN": "readonly"
+  },
+  "plugins": [
+    "jest"
+  ],
+  "rules": {
     "arrow-body-style": "off",
     "comma-dangle": "off",
     "no-console": "warn",
