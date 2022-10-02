@@ -78,12 +78,14 @@ const paramsBuilder = (object) => {
     return object;
   }
   // Check for valid tweet ID
-  const tweetID = object.url.split('?')[0].split('/')[5];
-  if (!tweetID || !/\d{8,}/.test(tweetID)) {
+  const tweetID = object.url.match(/\d{8,}/);
+  if (!tweetID) {
     object.message = 'The Tweet URL contains invalid parameters';
     return object;
   }
-  object.id = tweetID;
+  // Save the id on params object
+  object.id = tweetID.shift();
+  // Rewrite selector key to save the boolean from the dictionary
   if (object.selector) {
     object.selector = JSON.parse(object.selector).selector;
   }
@@ -108,13 +110,13 @@ const handleRequest = async (request) => {
       },
     })
       .then((response) => response.json());
-    // Check if the API gave them for any errors
-    if (twitterAPI.errors !== undefined) {
+    // Check if the API gave any errors
+    if (twitterAPI.errors) {
       dtwitterResponse = {
         error: twitterAPI.errors[0].message.replace('.', '')
       };
       // Check if the tweet has media on it
-    } else if (twitterAPI.extended_entities === undefined) {
+    } else if (!twitterAPI.extended_entities) {
       dtwitterResponse = {
         error: 'Media not found for inputted URL'
       };
