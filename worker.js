@@ -3,15 +3,6 @@ const shortcutName = 'DTwitter';
 const supportedVersions = ['3.0.8'];
 const landingPage = ''; // index.html
 
-// return Response with its corresponding Content-Type
-const addHeaders = (body) => {
-  return new Response(JSON.stringify(body), {
-    headers: {
-      'Content-Type': 'application/json; charset=UTF-8'
-    }
-  });
-};
-
 // Build the response
 const jsonBuilder = (json, isSelectorEnabled) => {
   const dtwitterJSON = {
@@ -63,6 +54,15 @@ const jsonBuilder = (json, isSelectorEnabled) => {
       .filter((item) => !!item)
   };
   return dtwitterJSON;
+};
+
+// return Response with its corresponding Content-Type
+const addHeaders = (body) => {
+  return new Response(JSON.stringify(body), {
+    headers: {
+      'Content-Type': 'application/json; charset=UTF-8'
+    }
+  });
 };
 
 // Check params
