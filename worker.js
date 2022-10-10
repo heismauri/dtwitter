@@ -49,7 +49,7 @@ const jsonBuilder = (json, isSelectorEnabled) => {
       }
       // Photos
       if (mediaType === 'photo') {
-        const extension = media.media_url_https.match(/\.[a-z]+$/gi).shift();
+        const [extension] = media.media_url_https.match(/\.[a-z]+$/gi);
         const photoLink = media.media_url_https.replace(extension, '');
         const photoExtension = extension.replace('.', '');
         const finalPhotoLink = `${photoLink}?format=${photoExtension}&name=orig`;
@@ -94,7 +94,7 @@ const paramsBuilder = (object) => {
     return object;
   }
   // Save the id on params object
-  object.id = tweetID.shift();
+  [object.id] = tweetID;
   // Rewrite selector key to save the boolean from the dictionary
   if (object.selector) {
     object.selector = JSON.parse(object.selector).selector;
