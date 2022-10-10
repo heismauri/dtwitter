@@ -3,6 +3,15 @@ const shortcutName = 'DTwitter';
 const supportedVersions = ['3.0.8'];
 const landingPage = ''; // index.html
 
+// Sometimes Twitter's API does not return anything, so this prevents the script from breaking
+const parseJSON = (text) => {
+  try {
+    return JSON.parse(text);
+  } catch (error) {
+    return undefined;
+  }
+};
+
 // Build the response
 const jsonBuilder = (json, isSelectorEnabled) => {
   const dtwitterJSON = {
@@ -57,8 +66,9 @@ const jsonBuilder = (json, isSelectorEnabled) => {
 };
 
 // return Response with its corresponding Content-Type
-const addHeaders = (body) => {
+const addHeaders = (body, options = {}) => {
   return new Response(JSON.stringify(body), {
+    ...options,
     headers: {
       'Content-Type': 'application/json; charset=UTF-8'
     }
@@ -78,7 +88,7 @@ const paramsBuilder = (object) => {
     return object;
   }
   // Check for valid tweet ID
-  const tweetID = object.url.match(/\d{8,}/);
+  const tweetID = object.url.match(/\d{18,}/);
   if (!tweetID) {
     object.message = 'The Tweet URL contains invalid parameters';
     return object;
@@ -109,20 +119,25 @@ const handleRequest = async (request) => {
         Authorization: `Bearer ${TOKEN}`
       },
     })
-      .then((response) => response.json());
+      .then((response) => response.text());
+    const twitterJSON = parseJSON(twitterAPI);
     // Check if the API gave any errors
-    if (twitterAPI.errors) {
+    if (!twitterJSON) {
       dtwitterResponse = {
-        error: twitterAPI.errors[0].message.replace('.', '')
+        error: 'Twitter\'s API returned an empty response, please try again later'
+      };
+    } else if (twitterJSON.errors) {
+      dtwitterResponse = {
+        error: twitterJSON.errors[0].message.replace('.', '')
       };
       // Check if the tweet has media on it
-    } else if (!twitterAPI.extended_entities) {
+    } else if (!twitterJSON.extended_entities) {
       dtwitterResponse = {
         error: 'Media not found for inputted URL'
       };
     } else {
       // Success
-      dtwitterResponse = jsonBuilder(twitterAPI, params.selector);
+      dtwitterResponse = jsonBuilder(twitterJSON, params.selector);
     }
     return addHeaders(dtwitterResponse);
   }
