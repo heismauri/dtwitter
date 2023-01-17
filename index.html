@@ -4,19 +4,33 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta http-equiv="pragma" content="no-cache">
-    <link rel="shortcut icon" href="https://www.heismauri.com/assets/shortcuts/${shortcutName.toLowerCase()}/favicon.png">
-    <title>${shortcutName} API - heismauri</title>
-    <meta name="description" content="This API only works with the Siri Shortcut ${shortcutName} which can be downloaded on RoutineHub">
+    <link rel="shortcut icon" href="https://www.heismauri.com/assets/shortcuts/${shortcutName.toLowerCase()}/icon.png">
+    <title>${shortcutName} - heismauri</title>
+    <meta name="description" content="Download videos, photos and GIFs from Twitter, it also works with the Siri Shortcut ${shortcutName} which can be downloaded on RoutineHub">
     <link rel="stylesheet" href="https://www.heismauri.com/assets/shortcuts/style.css">
+    <link rel="stylesheet" href="https://www.heismauri.com/assets/shortcuts/downloader.css">
+    <script>
+      const currentVersion = '${supportedVersions[supportedVersions.length - 1]}'
+    </script>
   </head>
   <body>
-    <div class="container">
-      <h1 class="text-center margin-x">${shortcutName}</h1>
-      <img class="shortcut-icon" width="200" alt="${shortcutName}'s shortcut icon" srcset="https://www.heismauri.com/assets/shortcuts/${shortcutName.toLowerCase()}/icon-x2.png 2x, https://www.heismauri.com/assets/shortcuts/${shortcutName.toLowerCase()}/icon-x3.png 3x" src="https://www.heismauri.com/assets/shortcuts/${shortcutName.toLowerCase()}/icon.png">
-      <p class="text-center margin-x">This API only works with the Siri Shortcut <i>"${shortcutName}"</i> which can be downloaded <a href="https://routinehub.co/shortcut/${shortcutId}/">here</a></p>
-      <div class="text-center copyright">
-        <a href="https://www.heismauri.com/">www.heismauri.com</a>
-      </div>
-    </div>
+    <main class="container text-center ${shortcutName.toLowerCase()}">
+      <header>
+        <h1 class="p-x m-0">${shortcutName}</h1>
+        <img class="shortcut-icon" width="200" alt="${shortcutName}'s shortcut icon" srcset="https://www.heismauri.com/assets/shortcuts/${shortcutName.toLowerCase()}/icon-x2.png 2x, https://www.heismauri.com/assets/shortcuts/${shortcutName.toLowerCase()}/icon-x3.png 3x" src="https://www.heismauri.com/assets/shortcuts/${shortcutName.toLowerCase()}/icon.png">
+        <p class="p-x m-0">This API also works with the Siri Shortcut <strong>"${shortcutName}"</strong> which can be downloaded on <a href="https://routinehub.co/shortcut/${shortcutId}/">RoutineHub</a></p>
+      </header>
+      <p class="m-0"><i>The web downloader is still in Beta, make sure to report any errors!</i></p>
+      <form id="downloader-form" class="form-group p-x" action="#">
+        <input class="downloader-url" type="text" name="url" placeholder="Your ${shortcutName} link goes here!">
+        <button id="downloader-submit" class="btn downloader-submit" type="submit">Download</button>
+      </form>
+      <div id="downloader-media"></div>
+      <a class="btn kofi-button" href="https://ko-fi.com/heismauri">Love <strong>${shortcutName}</strong>? <i class="fa-regular fa-heart"></i> Buy me a Ko-fi!</a>
+    </main>
+    <footer class="copyright text-center p-x m-0">
+      <a href="https://www.heismauri.com/">www.heismauri.com</a>
+    </footer>
+    <script src="https://www.heismauri.com/assets/shortcuts/${shortcutName.toLowerCase()}/downloader.js"></script>
   </body>
 </html>

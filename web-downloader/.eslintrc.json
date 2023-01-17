@@ -1,0 +1,21 @@
+{
+	"env": {
+		"browser": true
+	},
+	"extends": "airbnb-base",
+  "globals": {
+    "currentVersion": "readonly"
+  },
+	"rules": {
+    "arrow-body-style": "off",
+    "comma-dangle": ["warn", "never"],
+    "no-console": "warn",
+    "no-new-object": "off",
+    "no-param-reassign": "off",
+    "no-restricted-globals": "off",
+    "no-unused-vars": "off",
+    "quote-props": ["error", "consistent"],
+    "quotes": ["error", "single"],
+    "no-alert": "off"
+  }
+}
