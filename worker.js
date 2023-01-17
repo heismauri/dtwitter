@@ -1,9 +1,10 @@
 const shortcutId = '6166';
 const shortcutName = 'DTwitter';
-const supportedVersions = ['3.0.8'];
+const supportedVersions = ['3.1.0'];
 const landingPage = ''; // index.html
 
-// Sometimes Twitter's API does not return anything, so this prevents the script from breaking
+// Sometimes Twitter's API does not return a valid response
+// this prevents the script from breaking
 const parseJSON = (text) => {
   try {
     return JSON.parse(text);
@@ -15,42 +16,42 @@ const parseJSON = (text) => {
 // Build the response
 const jsonBuilder = (json, isSelectorEnabled) => {
   const dtwitterJSON = {
-    media: json.extended_entities.media.map((media) => {
+    media: json.includes.media.map((media) => {
       let mediaTweet;
       const mediaType = media.type;
       // Video & GIFs
       if (mediaType === 'animated_gif' || mediaType === 'video') {
-        const video = media.video_info.variants.filter((variant) => variant.bitrate !== undefined);
-        video.sort((a, b) => a.bitrate - b.bitrate);
+        const videoVariants = media.variants.filter((variant) => variant.bit_rate !== undefined);
+        videoVariants.sort((a, b) => a.bit_rate - b.bit_rate);
         // Quality selector
         if (isSelectorEnabled && mediaType === 'video') {
-          const videoQuality = {
-            low: video[0].url,
+          const videoSelector = {
+            low: videoVariants[0].url,
           };
             // Append other qualities if available
-          if (video[1] && video[1].url) videoQuality.medium = video[1].url;
-          if (video[2] && video[2].url) videoQuality.high = video[2].url;
+          if (videoVariants[1] && videoVariants[1].url) videoSelector.medium = videoVariants[1].url;
+          if (videoVariants[2] && videoVariants[2].url) videoSelector.high = videoVariants[2].url;
           mediaTweet = {
             type: 'selector',
-            link: videoQuality
+            link: videoSelector
           };
-          // High resolution video
+          // High resolution videoVariants
         } else {
           mediaTweet = {
             type: mediaType,
-            link: video[video.length - 1].url
+            link: videoVariants[videoVariants.length - 1].url
           };
           // Only return sizes for GIFs
           if (mediaType === 'animated_gif') {
-            mediaTweet.width = media.sizes.large.w;
-            mediaTweet.height = media.sizes.large.h;
+            mediaTweet.width = media.width;
+            mediaTweet.height = media.height;
           }
         }
       }
       // Photos
       if (mediaType === 'photo') {
-        const [extension] = media.media_url_https.match(/\.[a-z]+$/gi);
-        const photoLink = media.media_url_https.replace(extension, '');
+        const [extension] = media.url.match(/\.[a-z]+$/gi);
+        const photoLink = media.url.replace(extension, '');
         const photoExtension = extension.replace('.', '');
         const finalPhotoLink = `${photoLink}?format=${photoExtension}&name=orig`;
         mediaTweet = {
@@ -60,7 +61,6 @@ const jsonBuilder = (json, isSelectorEnabled) => {
       }
       return mediaTweet;
     })
-      .filter((item) => !!item)
   };
   return dtwitterJSON;
 };
@@ -114,7 +114,7 @@ const handleRequest = async (request) => {
       };
       return addHeaders(dtwitterResponse);
     }
-    const twitterAPI = await fetch(`https://api.twitter.com/1.1/statuses/show.json?tweet_mode=extended&id=${params.id}`, {
+    const twitterAPI = await fetch(`https://api.twitter.com/2/tweets/${params.id}/?expansions=attachments.media_keys&media.fields=width,height,type,url,variants`, {
       headers: {
         Authorization: `Bearer ${TOKEN}`
       },
@@ -122,16 +122,16 @@ const handleRequest = async (request) => {
       .then((response) => response.text());
     const twitterJSON = parseJSON(twitterAPI);
     // Check if the API gave any errors
-    if (!twitterJSON) {
+    if (!twitterJSON || twitterJSON.detail === 'Too Many Requests') {
       dtwitterResponse = {
-        error: 'Twitter\'s API returned an empty response, please try again later'
+        error: 'Twitter\'s API does not seem to be working right now, please try again later'
       };
     } else if (twitterJSON.errors) {
       dtwitterResponse = {
-        error: twitterJSON.errors[0].message.replace('.', '')
+        error: (twitterJSON.errors[0].message || twitterJSON.errors[0].detail).replace('.', '')
       };
       // Check if the tweet has media on it
-    } else if (!twitterJSON.extended_entities) {
+    } else if (!(twitterJSON.data && twitterJSON.data.attachments)) {
       dtwitterResponse = {
         error: 'Media not found for inputted URL'
       };
