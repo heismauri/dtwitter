@@ -1,13 +1,19 @@
-import { fetch, FormData } from 'undici';
+import { Miniflare } from 'miniflare';
+import { FormData } from 'undici';
 
-const LatestVersion = '3.0.8';
+const LatestVersion = '3.1.0';
+const mf = new Miniflare({
+  scriptPath: 'worker.js',
+  envPath: '.env',
+  port: 1811
+});
 
 test('Can download videos', async () => {
   const form = new FormData();
   form.append('version', LatestVersion);
   form.append('url', 'https://twitter.com/KDA_MUSIC/status/1333078270640795649');
   form.append('selector', '{"selector":false}');
-  const dtwitterAPI = await fetch('http://localhost:8787', {
+  const dtwitterAPI = await mf.dispatchFetch('http://localhost:1811', {
     method: 'POST',
     body: form
   })
@@ -21,20 +27,22 @@ test('Can download videos with quality selector', async () => {
   form.append('version', LatestVersion);
   form.append('url', 'https://twitter.com/KDA_MUSIC/status/1333078270640795649');
   form.append('selector', '{"selector":true}');
-  const dtwitterAPI = await fetch('http://localhost:8787', {
+  const dtwitterAPI = await mf.dispatchFetch('http://localhost:1811', {
     method: 'POST',
     body: form
   })
     .then((response) => response.json());
   expect(dtwitterAPI.media[0].type).toBe('selector');
-  expect(dtwitterAPI.media[0].link.high).toMatch(/video.twimg.com/);
+  expect(dtwitterAPI.media[0].link.high).toMatch(/1280x720/);
+  expect(dtwitterAPI.media[0].link.medium).toMatch(/640x360/);
+  expect(dtwitterAPI.media[0].link.low).toMatch(/480x270/);
 });
 
 test('Can download GIFs', async () => {
   const form = new FormData();
   form.append('version', LatestVersion);
-  form.append('url', 'https://twitter.com/yeji_gif/status/1568177615865020416');
-  const dtwitterAPI = await fetch('http://localhost:8787', {
+  form.append('url', 'https://twitter.com/ITZYofficial/status/1584980589396242432');
+  const dtwitterAPI = await mf.dispatchFetch('http://localhost:1811', {
     method: 'POST',
     body: form
   })
@@ -49,11 +57,26 @@ test('Can download photos', async () => {
   const form = new FormData();
   form.append('version', LatestVersion);
   form.append('url', 'https://twitter.com/KDA_MUSIC/status/1331266329819623426');
-  const dtwitterAPI = await fetch('http://localhost:8787', {
+  const dtwitterAPI = await mf.dispatchFetch('http://localhost:1811', {
     method: 'POST',
     body: form
   })
     .then((response) => response.json());
   expect(dtwitterAPI.media[0].type).toBe('photo');
   expect(dtwitterAPI.media[0].link).toMatch(/pbs.twimg.com/);
+});
+
+test('Can download tweets with mixed media', async () => {
+  const form = new FormData();
+  form.append('version', LatestVersion);
+  form.append('url', 'https://twitter.com/aespa_official/status/1577282815250427907');
+  const dtwitterAPI = await mf.dispatchFetch('http://localhost:1811', {
+    method: 'POST',
+    body: form
+  })
+    .then((response) => response.json());
+  expect(dtwitterAPI.media[0].type).toBe('photo');
+  expect(dtwitterAPI.media[0].link).toMatch(/pbs.twimg.com/);
+  expect(dtwitterAPI.media[1].type).toBe('video');
+  expect(dtwitterAPI.media[1].link).toMatch(/video.twimg.com/);
 });
