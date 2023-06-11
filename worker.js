@@ -13,6 +13,43 @@ const parseJSON = (text) => {
   }
 };
 
+// return Response with its corresponding Content-Type
+const buildJSONResponse = (body, options = {}) => {
+  return new Response(JSON.stringify(body), {
+    ...options,
+    headers: {
+      'Content-Type': 'application/json; charset=UTF-8'
+    }
+  });
+};
+
+// Check params
+const paramsBuilder = (object) => {
+  // Check if installed version is the lastest one
+  if (!object.version || !supportedVersions.includes(object.version)) {
+    object.message = `Download the latest update on https://routinehub.co/shortcut/${shortcutId}/`;
+    return object;
+  }
+  // Check for valid URL
+  if (!object.url || !object.url.includes('twitter.com')) {
+    object.message = `URL not supported by ${shortcutName}`;
+    return object;
+  }
+  // Check for valid tweet ID
+  const tweetID = object.url.match(/\d{18,}/);
+  if (!tweetID) {
+    object.message = 'The Tweet URL contains invalid parameters';
+    return object;
+  }
+  // Save the id on params object
+  [object.id] = tweetID;
+  // Rewrite selector key to save the boolean from the dictionary
+  if (object.selector) {
+    object.selector = JSON.parse(object.selector).selector;
+  }
+  return object;
+};
+
 // Build the response
 const jsonBuilder = (json, isSelectorEnabled) => {
   const dtwitterJSON = {
@@ -65,87 +102,44 @@ const jsonBuilder = (json, isSelectorEnabled) => {
   return dtwitterJSON;
 };
 
-// return Response with its corresponding Content-Type
-const addHeaders = (body, options = {}) => {
-  return new Response(JSON.stringify(body), {
-    ...options,
-    headers: {
-      'Content-Type': 'application/json; charset=UTF-8'
-    }
-  });
-};
-
-// Check params
-const paramsBuilder = (object) => {
-  // Check if installed version is the lastest one
-  if (!object.version || !supportedVersions.includes(object.version)) {
-    object.message = `Download the latest update on https://routinehub.co/shortcut/${shortcutId}/`;
-    return object;
-  }
-  // Check for valid URL
-  if (!object.url || !object.url.includes('twitter.com')) {
-    object.message = `URL not supported by ${shortcutName}`;
-    return object;
-  }
-  // Check for valid tweet ID
-  const tweetID = object.url.match(/\d{18,}/);
-  if (!tweetID) {
-    object.message = 'The Tweet URL contains invalid parameters';
-    return object;
-  }
-  // Save the id on params object
-  [object.id] = tweetID;
-  // Rewrite selector key to save the boolean from the dictionary
-  if (object.selector) {
-    object.selector = JSON.parse(object.selector).selector;
-  }
-  return object;
-};
-
 // Call the Twitter API 1.1
-const handleRequest = async (request) => {
-  if (request.method === 'POST') {
-    let dtwitterResponse;
-    const objectForm = Object.fromEntries(await request.formData());
-    const params = paramsBuilder(objectForm);
-    if (params.message) {
-      dtwitterResponse = {
-        error: params.message
-      };
-      return addHeaders(dtwitterResponse);
-    }
-    const twitterAPI = await fetch(`https://api.twitter.com/2/tweets/${params.id}/?expansions=attachments.media_keys&media.fields=width,height,type,url,variants`, {
-      headers: {
-        Authorization: `Bearer ${TOKEN}`
-      },
-    })
-      .then((response) => response.text());
-    const twitterJSON = parseJSON(twitterAPI);
-    // Check if the API gave any errors
-    if (!twitterJSON || twitterJSON.detail === 'Too Many Requests') {
-      dtwitterResponse = {
-        error: 'Twitter\'s API does not seem to be working right now, please try again later'
-      };
-    } else if (twitterJSON.errors) {
-      dtwitterResponse = {
-        error: (twitterJSON.errors[0].message || twitterJSON.errors[0].detail).replace('.', '')
-      };
-      // Check if the tweet has media on it
-    } else if (!(twitterJSON.data && twitterJSON.data.attachments)) {
-      dtwitterResponse = {
-        error: 'Media not found for inputted URL'
-      };
-    } else {
-      // Success
+const handlePostRequest = async (request, env) => {
+  const objectForm = Object.fromEntries(await request.formData());
+  const params = paramsBuilder(objectForm);
+  if (params.message) {
+    return buildJSONResponse({ error: params.message }, { status: 400 });
+  }
+  const twitterAPI = await fetch(`https://api.twitter.com/2/tweets/${params.id}/?expansions=attachments.media_keys&media.fields=width,height,type,url,variants`, {
+    headers: {
+      Authorization: `Bearer ${env.TOKEN}`
+    },
+  })
+    .then((response) => response.text());
+  const twitterJSON = parseJSON(twitterAPI);
+  // Check if the API gave any errors
+  if (!twitterJSON || twitterJSON.detail === 'Too Many Requests') {
+    return buildJSONResponse({ error: 'Twitter\'s API does not seem to be working right now, please try again later' }, { status: 503 });
+  }
+  if (twitterJSON.errors) {
+    return buildJSONResponse({ error: (twitterJSON.errors[0].message || twitterJSON.errors[0].detail).replace('.', '') }, { status: 400 });
+  }
+  // Check if the tweet has media on it
+  if (!(twitterJSON.data && twitterJSON.data.attachments)) {
+    return buildJSONResponse({ error: 'Sorry, the requested media could not be found for the provided URL' }, { status: 404 });
+  }
+  // Success
+  return buildJSONResponse(jsonBuilder(twitterJSON, params.selector), { status: 200 });
+};
+
 export default {
   fetch(request, env) {
     if (request.method === 'POST') {
-      return handleRequest(request, env);
-  }
-  return new Response(landingPage, {
-    headers: {
-      'Content-Type': 'text/html; charset=UTF-8'
-    },
-  });
+      return handlePostRequest(request, env);
+    }
+    return new Response(landingPage, {
+      headers: {
+        'Content-Type': 'text/html; charset=UTF-8'
+      },
+    });
   }
 };
