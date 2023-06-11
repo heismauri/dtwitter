@@ -137,18 +137,15 @@ const handleRequest = async (request) => {
       };
     } else {
       // Success
-      dtwitterResponse = jsonBuilder(twitterJSON, params.selector);
-    }
-    return addHeaders(dtwitterResponse);
+export default {
+  fetch(request, env) {
+    if (request.method === 'POST') {
+      return handleRequest(request, env);
   }
   return new Response(landingPage, {
     headers: {
       'Content-Type': 'text/html; charset=UTF-8'
     },
   });
+  }
 };
-
-// Workers event listener
-addEventListener('fetch', (event) => {
-  event.respondWith(handleRequest(event.request));
-});
