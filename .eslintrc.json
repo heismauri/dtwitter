@@ -4,9 +4,6 @@
     "jest/globals": true
   },
   "extends": "airbnb-base",
-  "globals": {
-    "TOKEN": "readonly"
-  },
   "plugins": [
     "jest"
   ],
