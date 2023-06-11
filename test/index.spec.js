@@ -4,7 +4,7 @@ import { FormData } from 'undici';
 const LatestVersion = '3.1.0';
 const mf = new Miniflare({
   scriptPath: 'worker.js',
-  envPath: '.env',
+  envPath: '.dev.vars',
   port: 1811
 });
 
