@@ -1,2 +1,3 @@
-[miniflare]
-env_path = ".env"
+name = "dtwitter"
+main = "worker.js"
+compatibility_date = "2023-05-18"
