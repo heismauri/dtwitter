@@ -14,7 +14,7 @@ const parseJSON = (text) => {
 };
 
 // return Response with its corresponding Content-Type
-const buildJSONResponse = (body, options = {}) => {
+const jsonResponseBuilder = (body, options = {}) => {
   return new Response(JSON.stringify(body), {
     ...options,
     headers: {
@@ -52,14 +52,15 @@ const paramsBuilder = (object) => {
 
 // Build the response
 const jsonBuilder = (json, isSelectorEnabled) => {
-  const dtwitterJSON = {
+  return {
     media: json.includes.media.map((media) => {
       let mediaTweet;
       const mediaType = media.type;
       // Video & GIFs
       if (mediaType === 'animated_gif' || mediaType === 'video') {
-        const videoVariants = media.variants.filter((variant) => variant.bit_rate !== undefined);
-        videoVariants.sort((a, b) => a.bit_rate - b.bit_rate);
+        const videoVariants = media.variants
+          .filter((variant) => variant.bit_rate !== undefined)
+          .sort((a, b) => a.bit_rate - b.bit_rate);
         // Quality selector
         if (isSelectorEnabled && mediaType === 'video') {
           const videoSelector = {
@@ -99,7 +100,6 @@ const jsonBuilder = (json, isSelectorEnabled) => {
       return mediaTweet;
     })
   };
-  return dtwitterJSON;
 };
 
 // Call the Twitter API 1.1
@@ -107,9 +107,14 @@ const handlePostRequest = async (request, env) => {
   const objectForm = Object.fromEntries(await request.formData());
   const params = paramsBuilder(objectForm);
   if (params.message) {
-    return buildJSONResponse({ error: params.message }, { status: 400 });
+    return jsonResponseBuilder({ error: params.message }, { status: 400 });
   }
-  const twitterAPI = await fetch(`https://api.twitter.com/2/tweets/${params.id}/?expansions=attachments.media_keys&media.fields=width,height,type,url,variants`, {
+  const twitterEndpoint = new URL(`https://api.twitter.com/2/tweets/${params.id}`);
+  twitterEndpoint.search = new URLSearchParams({
+    'expansions': 'attachments.media_keys',
+    'media.fields': ['width', 'height', 'type', 'url', 'variants'],
+  }).toString();
+  const twitterAPI = await fetch(twitterEndpoint, {
     headers: {
       Authorization: `Bearer ${env.TOKEN}`
     },
@@ -118,17 +123,26 @@ const handlePostRequest = async (request, env) => {
   const twitterJSON = parseJSON(twitterAPI);
   // Check if the API gave any errors
   if (!twitterJSON || twitterJSON.detail === 'Too Many Requests') {
-    return buildJSONResponse({ error: 'Twitter\'s API does not seem to be working right now, please try again later' }, { status: 503 });
+    return jsonResponseBuilder(
+      { error: 'Twitter\'s API does not seem to be working right now,please try again later' },
+      { status: 503 }
+    );
   }
   if (twitterJSON.errors) {
-    return buildJSONResponse({ error: (twitterJSON.errors[0].message || twitterJSON.errors[0].detail).replace('.', '') }, { status: 400 });
+    return jsonResponseBuilder(
+      { error: (twitterJSON.errors[0].message || twitterJSON.errors[0].detail).replace('.', '') },
+      { status: 400 }
+    );
   }
   // Check if the tweet has media on it
   if (!(twitterJSON.data && twitterJSON.data.attachments)) {
-    return buildJSONResponse({ error: 'Sorry, the requested media could not be found for the provided URL' }, { status: 404 });
+    return jsonResponseBuilder(
+      { error: 'Sorry, the requested media could not be found for the provided URL' },
+      { status: 404 }
+    );
   }
   // Success
-  return buildJSONResponse(jsonBuilder(twitterJSON, params.selector), { status: 200 });
+  return jsonResponseBuilder(jsonBuilder(twitterJSON, params.selector), { status: 200 });
 };
 
 export default {
