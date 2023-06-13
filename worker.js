@@ -1,6 +1,6 @@
 const shortcutId = '6166';
 const shortcutName = 'DTwitter';
-const supportedVersions = ['3.1.0'];
+const supportedVersions = ['3.1.2'];
 const landingPage = ''; // index.html
 
 // Sometimes Twitter's API does not return a valid response
@@ -122,7 +122,7 @@ const handlePostRequest = async (request, env) => {
     .then((response) => response.text());
   const twitterJSON = parseJSON(twitterAPI);
   // Check if the API gave any errors
-  if (!twitterJSON || twitterJSON.detail === 'Too Many Requests') {
+  if (!twitterJSON || twitterJSON.detail === 'Too Many Requests' || twitterJSON.title === 'Client Forbidden') {
     return jsonResponseBuilder(
       { error: 'Twitter\'s API does not seem to be working right now,please try again later' },
       { status: 503 }
