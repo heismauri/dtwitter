@@ -102,7 +102,7 @@ const jsonBuilder = (json, isSelectorEnabled) => {
   };
 };
 
-// Call the Twitter API 1.1
+// Call the Twitter API 2
 const handlePostRequest = async (request, env) => {
   const objectForm = Object.fromEntries(await request.formData());
   const params = paramsBuilder(objectForm);
