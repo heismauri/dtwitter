@@ -1,7 +1,7 @@
 import { Miniflare } from 'miniflare';
 import { FormData } from 'undici';
 
-const LatestVersion = '3.1.0';
+const LatestVersion = '3.1.2';
 const mf = new Miniflare({
   scriptPath: 'worker.1.1.js',
   envPath: '.dev.vars',
