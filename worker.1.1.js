@@ -1,6 +1,6 @@
 const shortcutId = '6166';
 const shortcutName = 'DTwitter';
-const supportedVersions = ['3.1.2'];
+const supportedVersions = ['3.2.0'];
 const landingPage = ''; // index.html
 
 // Sometimes Twitter's API does not return a valid response
@@ -56,8 +56,19 @@ const jsonBuilder = (json, isSelectorEnabled) => {
     media: json.extended_entities.media.map((media) => {
       let mediaTweet;
       const mediaType = media.type;
+      // Photos
+      if (mediaType === 'photo') {
+        const [extension] = media.media_url_https.match(/\.[a-z]+$/gi);
+        const photoLink = media.media_url_https.replace(extension, '');
+        const photoExtension = extension.replace('.', '');
+        const finalPhotoLink = `${photoLink}?format=${photoExtension}&name=orig`;
+        mediaTweet = {
+          type: mediaType,
+          link: finalPhotoLink
+        };
+        return mediaTweet;
+      }
       // Video & GIFs
-      if (mediaType === 'animated_gif' || mediaType === 'video') {
         const videoVariants = media.video_info.variants
           .filter((variant) => variant.bitrate !== undefined)
           .sort((a, b) => a.bitrate - b.bitrate);
@@ -73,29 +84,17 @@ const jsonBuilder = (json, isSelectorEnabled) => {
             type: 'selector',
             link: videoSelector
           };
-          // High resolution videoVariants
-        } else {
+        return mediaTweet;
+      }
+      // Return only highest video resultion
           mediaTweet = {
             type: mediaType,
             link: videoVariants[videoVariants.length - 1].url
           };
           // Only return sizes for GIFs
           if (mediaType === 'animated_gif') {
-            mediaTweet.width = media.original_info.width;
-            mediaTweet.height = media.original_info.height;
-          }
-        }
-      }
-      // Photos
-      if (mediaType === 'photo') {
-        const [extension] = media.media_url_https.match(/\.[a-z]+$/gi);
-        const photoLink = media.media_url_https.replace(extension, '');
-        const photoExtension = extension.replace('.', '');
-        const finalPhotoLink = `${photoLink}?format=${photoExtension}&name=orig`;
-        mediaTweet = {
-          type: mediaType,
-          link: finalPhotoLink
-        };
+        mediaTweet.width = media.sizes.large.w;
+        mediaTweet.height = media.sizes.large.h;
       }
       return mediaTweet;
     })
