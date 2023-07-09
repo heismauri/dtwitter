@@ -69,30 +69,30 @@ const jsonBuilder = (json, isSelectorEnabled) => {
         return mediaTweet;
       }
       // Video & GIFs
-        const videoVariants = media.video_info.variants
-          .filter((variant) => variant.bitrate !== undefined)
-          .sort((a, b) => a.bitrate - b.bitrate);
-        // Quality selector
-        if (isSelectorEnabled && mediaType === 'video') {
-          const videoSelector = {
-            low: videoVariants[0].url,
-          };
-            // Append other qualities if available
-          if (videoVariants[1] && videoVariants[1].url) videoSelector.medium = videoVariants[1].url;
-          if (videoVariants[2] && videoVariants[2].url) videoSelector.high = videoVariants[2].url;
-          mediaTweet = {
-            type: 'selector',
-            link: videoSelector
-          };
+      const videoVariants = media.video_info.variants
+        .filter((variant) => variant.bitrate !== undefined)
+        .sort((a, b) => a.bitrate - b.bitrate);
+      // Quality selector
+      if (isSelectorEnabled && mediaType === 'video') {
+        const videoSelector = {
+          low: videoVariants[0].url,
+        };
+        // Append other qualities if available
+        if (videoVariants[1] && videoVariants[1].url) videoSelector.medium = videoVariants[1].url;
+        if (videoVariants[2] && videoVariants[2].url) videoSelector.high = videoVariants[2].url;
+        mediaTweet = {
+          type: 'selector',
+          link: videoSelector
+        };
         return mediaTweet;
       }
       // Return only highest video resultion
-          mediaTweet = {
-            type: mediaType,
-            link: videoVariants[videoVariants.length - 1].url
-          };
-          // Only return sizes for GIFs
-          if (mediaType === 'animated_gif') {
+      mediaTweet = {
+        type: mediaType,
+        link: videoVariants[videoVariants.length - 1].url
+      };
+      // Only return sizes for GIFs
+      if (mediaType === 'animated_gif') {
         mediaTweet.width = media.sizes.large.w;
         mediaTweet.height = media.sizes.large.h;
       }
@@ -125,6 +125,12 @@ const handlePostRequest = async (request, env) => {
     return jsonResponseBuilder(
       { error: 'Twitter\'s API does not seem to be working right now,please try again later' },
       { status: 503 }
+    );
+  }
+  if (twitterJSON.errors && twitterJSON.errors[0].code === 34) {
+    return jsonResponseBuilder(
+      { error: 'Sorry, the download may have failed due to the presence of explicit material in the tweet' },
+      { status: 400 }
     );
   }
   if (twitterJSON.errors) {
