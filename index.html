@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -8,7 +8,6 @@
     <title>${shortcutName} - heismauri</title>
     <meta name="description" content="Download videos, photos and GIFs from Twitter, it also works with the Siri Shortcut ${shortcutName} which can be downloaded on RoutineHub">
     <link rel="stylesheet" href="https://www.heismauri.com/assets/shortcuts/style.css">
-    <link rel="stylesheet" href="https://www.heismauri.com/assets/shortcuts/downloader.css">
     <script>
       const currentVersion = '${supportedVersions[supportedVersions.length - 1]}'
     </script>
@@ -16,21 +15,22 @@
   <body>
     <main class="container text-center ${shortcutName.toLowerCase()}">
       <header>
-        <h1 class="p-x m-0">${shortcutName}</h1>
-        <img class="shortcut-icon" width="200" alt="${shortcutName}'s shortcut icon" srcset="https://www.heismauri.com/assets/shortcuts/${shortcutName.toLowerCase()}/icon-x2.png 2x, https://www.heismauri.com/assets/shortcuts/${shortcutName.toLowerCase()}/icon-x3.png 3x" src="https://www.heismauri.com/assets/shortcuts/${shortcutName.toLowerCase()}/icon.png">
-        <p class="p-x m-0">This API also works with the Siri Shortcut <strong>"${shortcutName}"</strong> which can be downloaded on <a href="https://routinehub.co/shortcut/${shortcutId}/">RoutineHub</a></p>
+        <h1 class="py-4 m-0">${shortcutName}</h1>
+        <img class="shortcut-icon" width="200" height="200" alt="${shortcutName}'s shortcut icon" srcset="https://www.heismauri.com/assets/shortcuts/${shortcutName.toLowerCase()}/icon-x2.png 2x, https://www.heismauri.com/assets/shortcuts/${shortcutName.toLowerCase()}/icon-x3.png 3x" src="https://www.heismauri.com/assets/shortcuts/${shortcutName.toLowerCase()}/icon.png">
+        <p class="py-4 m-0">This API also works with the Siri Shortcut <strong>"${shortcutName}"</strong> which can be downloaded on <a href="https://routinehub.co/shortcut/${shortcutId}/">RoutineHub</a></p>
       </header>
       <p class="m-0"><i>The web downloader is still in Beta, make sure to report any errors!</i></p>
-      <form id="downloader-form" class="form-group p-x" action="#">
+      <form id="downloader-form" class="form-group py-4" action="#">
         <input class="downloader-url" type="text" name="url" placeholder="Your ${shortcutName} link goes here!">
         <button id="downloader-submit" class="btn downloader-submit" type="submit">Download</button>
       </form>
       <div id="downloader-media"></div>
       <a class="btn kofi-button" href="https://ko-fi.com/heismauri">Love <strong>${shortcutName}</strong>? <i class="fa-regular fa-heart"></i> Buy me a Ko-fi!</a>
     </main>
-    <footer class="copyright text-center p-x m-0">
+    <footer class="copyright text-center py-4 m-0">
       <a href="https://www.heismauri.com/">www.heismauri.com</a>
     </footer>
-    <script src="https://www.heismauri.com/assets/shortcuts/${shortcutName.toLowerCase()}/downloader.js"></script>
+    <link rel="stylesheet" href="https://www.heismauri.com/assets/shortcuts/downloader.css">
+    <script defer src="https://www.heismauri.com/assets/shortcuts/${shortcutName.toLowerCase()}/downloader.js"></script>
   </body>
 </html>
