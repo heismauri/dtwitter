@@ -15,7 +15,7 @@
     "no-restricted-globals": "off",
     "no-unused-vars": "off",
     "quote-props": ["error", "consistent"],
-    "quotes": ["error", "single"],
+    "quotes": ["error", "single", { "avoidEscape": true }],
     "max-len": ["error", { "code": 120, "tabWidth": 2 }]
   }
 }

@@ -123,7 +123,7 @@ const handlePostRequest = async (request, env) => {
   // Check if the API gave any errors
   if (!twitterJSON) {
     return jsonResponseBuilder(
-      { error: 'Twitter\'s API does not seem to be working right now,please try again later' },
+      { error: "Twitter's API does not seem to be working right now,please try again later" },
       { status: 503 }
     );
   }
