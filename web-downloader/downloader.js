@@ -39,7 +39,7 @@ const dtwitterAPI = async (url) => {
           } else {
             htmlMedia.innerHTML = `
             <a class="btn btn-download" href="${element.link}" target="_blank">Save video</a>
-            <video controls>
+            <video controls loop autoplay muted>
               <source src="${element.link}" type="video/mp4">
             </video>
             `;
