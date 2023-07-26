@@ -86,3 +86,7 @@ test('Can download tweets with mixed media', async () => {
   expect(dtwitterAPI.media[1].type).toBe('video');
   expect(dtwitterAPI.media[1].link).toMatch(/video.twimg.com/);
 });
+
+afterAll(async () => {
+  await mf.dispose();
+});
