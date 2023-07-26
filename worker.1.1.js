@@ -136,7 +136,7 @@ const handlePostRequest = async (request, env) => {
   if (twitterJSON.errors) {
     return jsonResponseBuilder(
       { error: (twitterJSON.errors[0].message || twitterJSON.errors[0].detail).replace('.', '') },
-      { status: 400 }
+      { status: 503 }
     );
   }
   // Check if the tweet has media on it
