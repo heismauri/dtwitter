@@ -1,7 +1,6 @@
 import { Miniflare } from 'miniflare';
 import { FormData } from 'undici';
 
-const latestVersion = '3.2.0';
 const mf = new Miniflare({
   scriptPath: 'worker.1.1.js',
   envPath: '.dev.vars',
@@ -9,14 +8,18 @@ const mf = new Miniflare({
   port: 1811
 });
 
-test('Can download videos', async () => {
+const buildForm = (url, selector = false) => {
   const form = new FormData();
-  form.append('version', latestVersion);
-  form.append('url', 'https://twitter.com/KDA_MUSIC/status/1333078270640795649');
-  form.append('selector', '{"selector":false}');
+  form.append('version', '4.0.0');
+  form.append('url', url);
+  form.append('selector', JSON.stringify({ selector }));
+  return form;
+};
+
+test('Can download videos', async () => {
   const dtwitterAPI = await mf.dispatchFetch('http://localhost:1811', {
     method: 'POST',
-    body: form
+    body: buildForm('https://twitter.com/i/status/1333078270640795649')
   })
     .then((response) => response.json());
   expect(dtwitterAPI).toHaveProperty('media');
@@ -25,13 +28,9 @@ test('Can download videos', async () => {
 });
 
 test('Can download videos with quality selector', async () => {
-  const form = new FormData();
-  form.append('version', latestVersion);
-  form.append('url', 'https://twitter.com/KDA_MUSIC/status/1333078270640795649');
-  form.append('selector', '{"selector":true}');
   const dtwitterAPI = await mf.dispatchFetch('http://localhost:1811', {
     method: 'POST',
-    body: form
+    body: buildForm('https://twitter.com/i/status/1333078270640795649', true)
   })
     .then((response) => response.json());
   expect(dtwitterAPI).toHaveProperty('media');
@@ -42,28 +41,21 @@ test('Can download videos with quality selector', async () => {
 });
 
 test('Can download GIFs', async () => {
-  const form = new FormData();
-  form.append('version', latestVersion);
-  form.append('url', 'https://twitter.com/ITZYofficial/status/1584980589396242432');
   const dtwitterAPI = await mf.dispatchFetch('http://localhost:1811', {
     method: 'POST',
-    body: form
+    body: buildForm('https://twitter.com/i/status/1584980589396242432')
   })
     .then((response) => response.json());
   expect(dtwitterAPI).toHaveProperty('media');
   expect(dtwitterAPI.media[0].type).toBe('animated_gif');
   expect(dtwitterAPI.media[0].link).toMatch(/video.twimg.com/);
-  expect(typeof dtwitterAPI.media[0].width).toBe('number');
-  expect(typeof dtwitterAPI.media[0].height).toBe('number');
+  expect(dtwitterAPI.media[0].thumbnail).toMatch(/tweet_video_thumb/);
 });
 
 test('Can download photos', async () => {
-  const form = new FormData();
-  form.append('version', latestVersion);
-  form.append('url', 'https://twitter.com/KDA_MUSIC/status/1331266329819623426');
   const dtwitterAPI = await mf.dispatchFetch('http://localhost:1811', {
     method: 'POST',
-    body: form
+    body: buildForm('https://twitter.com/i/status/1331266329819623426')
   })
     .then((response) => response.json());
   expect(dtwitterAPI).toHaveProperty('media');
@@ -72,19 +64,17 @@ test('Can download photos', async () => {
 });
 
 test('Can download tweets with mixed media', async () => {
-  const form = new FormData();
-  form.append('version', latestVersion);
-  form.append('url', 'https://twitter.com/aespa_official/status/1577282815250427907');
   const dtwitterAPI = await mf.dispatchFetch('http://localhost:1811', {
     method: 'POST',
-    body: form
+    body: buildForm('https://twitter.com/i/status/1577282815250427907')
   })
     .then((response) => response.json());
   expect(dtwitterAPI).toHaveProperty('media');
-  expect(dtwitterAPI.media[0].type).toBe('photo');
-  expect(dtwitterAPI.media[0].link).toMatch(/pbs.twimg.com/);
-  expect(dtwitterAPI.media[1].type).toBe('video');
-  expect(dtwitterAPI.media[1].link).toMatch(/video.twimg.com/);
+  expect(dtwitterAPI.media.length).toBe(6);
+  expect(dtwitterAPI.media[0].type).toBe('video');
+  expect(dtwitterAPI.media[0].link).toMatch(/video.twimg.com/);
+  expect(dtwitterAPI.media[2].type).toBe('photo');
+  expect(dtwitterAPI.media[2].link).toMatch(/pbs.twimg.com/);
 });
 
 afterAll(async () => {
