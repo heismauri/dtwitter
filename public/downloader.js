@@ -1,9 +1,9 @@
-const formElement = document.querySelector('#downloader-form');
-const mediaElement = document.querySelector('#downloader-media');
+const formElement = document.getElementById('downloader-form');
+const mediaElement = document.getElementById('downloader-media');
 
 const urlValidator = async (url) => {
   let mainURL = url;
-  if (/t.co/.test(mainURL)) {
+  if (/https:\/\/t.co/.test(mainURL)) {
     mainURL = await fetch(`https://urlexpander.heismauri.com/?url=${mainURL}`)
       .then((response) => response.json())
       .then((data) => data.url);
@@ -39,7 +39,7 @@ const dtwitterAPI = async (url) => {
           } else {
             htmlMedia.innerHTML = `
             <a class="btn btn-download" href="${element.link}" target="_blank">Save video</a>
-            <video controls loop autoplay muted>
+            <video controls ${element.type === 'animated_gif' && 'autoplay loop'}>
               <source src="${element.link}" type="video/mp4">
             </video>
             `;
@@ -59,15 +59,17 @@ formElement.addEventListener('submit', async (event) => {
   mediaElement.className = '';
   mediaElement.innerHTML = '<div class="ellipsis-loader"><div></div><div></div><div></div><div></div></div>';
   const tweetURL = event.currentTarget.url.value;
-  const urlValidatorResponse = await urlValidator(tweetURL);
-  if (urlValidatorResponse.success) {
-    await dtwitterAPI(urlValidatorResponse.url);
-  } else {
-    alert('Please insert a valid URL');
+  const { success: isValidURL, url } = await urlValidator(tweetURL);
+  if (!isValidURL) {
+    const errorMessage = 'Please insert a valid URL';
+    alert(errorMessage);
     mediaElement.innerHTML = '';
+    event.submitter.disabled = false;
+    throw new Error(errorMessage);
   }
+  await dtwitterAPI(url);
   setTimeout(() => {
     event.submitter.disabled = false;
+    formElement.scrollIntoView();
   }, '2000');
-  formElement.scrollIntoView();
 });
