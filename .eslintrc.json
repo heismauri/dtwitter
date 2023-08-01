@@ -16,6 +16,6 @@
     "no-unused-vars": "off",
     "quote-props": ["error", "consistent"],
     "quotes": ["error", "single", { "avoidEscape": true }],
-    "max-len": ["error", { "code": 120, "tabWidth": 2 }]
+    "max-len": ["error", { "code": 120, "tabWidth": 2, "ignoreTemplateLiterals": true, "ignoreStrings": true }]
   }
 }

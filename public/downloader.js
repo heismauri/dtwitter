@@ -9,7 +9,7 @@ const urlValidator = async (url) => {
       .then((data) => data.url);
   }
   return {
-    success: /twitter.com/.test(mainURL) && /\d{9,}/.test(mainURL),
+    success: /https:\/\/twitter.com/.test(mainURL) && /\d{9,}/.test(mainURL),
     url: mainURL
   };
 };
@@ -38,8 +38,8 @@ const dtwitterAPI = async (url) => {
             `;
           } else {
             htmlMedia.innerHTML = `
-            <a class="btn btn-download" href="${element.link}" target="_blank">Save video</a>
-            <video controls ${element.type === 'animated_gif' && 'autoplay loop'}>
+            <a class="btn btn-save" href="${element.link}" target="_blank">Save video</a>
+            <video ${element.type === 'animated_gif' ? 'controls autoplay loop' : 'controls'}>
               <source src="${element.link}" type="video/mp4">
             </video>
             `;
@@ -59,8 +59,8 @@ formElement.addEventListener('submit', async (event) => {
   mediaElement.className = '';
   mediaElement.innerHTML = '<div class="ellipsis-loader"><div></div><div></div><div></div><div></div></div>';
   const tweetURL = event.currentTarget.url.value;
-  const { success: isValidURL, url } = await urlValidator(tweetURL);
-  if (!isValidURL) {
+  const { success: validUrl, url } = await urlValidator(tweetURL);
+  if (!validUrl) {
     const errorMessage = 'Please insert a valid URL';
     alert(errorMessage);
     mediaElement.innerHTML = '';
@@ -70,6 +70,6 @@ formElement.addEventListener('submit', async (event) => {
   await dtwitterAPI(url);
   setTimeout(() => {
     event.submitter.disabled = false;
-    formElement.scrollIntoView();
   }, '2000');
+  formElement.scrollIntoView();
 });
