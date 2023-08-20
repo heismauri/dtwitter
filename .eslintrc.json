@@ -7,6 +7,9 @@
   "plugins": [
     "jest"
   ],
+  "parserOptions": {
+    "ecmaVersion": 2020
+  },
   "rules": {
     "arrow-body-style": "off",
     "comma-dangle": "off",
