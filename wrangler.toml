@@ -1,3 +1,8 @@
 name = "dtwitter"
-main = "worker.1.1.js"
+main = "worker.js"
 compatibility_date = "2023-05-18"
+workers_dev = false
+
+kv_namespaces = [
+  { binding = "guest", id = "716ee25bb65543c8aaa44c8d18de16cf", preview_id = "d69ca07021724fdfb3d758c07c487ce7" }
+]
