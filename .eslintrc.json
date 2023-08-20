@@ -3,6 +3,9 @@
     "worker": true,
     "jest/globals": true
   },
+  "globals": {
+    "guest": "readonly"
+  },
   "extends": "airbnb-base",
   "plugins": [
     "jest"
