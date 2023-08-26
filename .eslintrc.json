@@ -19,7 +19,6 @@
     "no-console": "warn",
     "no-param-reassign": "off",
     "no-restricted-globals": "off",
-    "no-unused-vars": "off",
     "quote-props": ["error", "consistent"],
     "quotes": ["error", "single", { "avoidEscape": true }],
     "max-len": ["error", { "code": 120, "tabWidth": 2, "ignoreTemplateLiterals": true, "ignoreStrings": true }]
