@@ -1,6 +1,6 @@
 {
   "name": "dtwitter",
-  "version": "3.2.0",
+  "version": "4.1.0",
   "description": "Download photos, videos and HQ GIFs from a public tweet",
   "type": "module",
   "repository": {
@@ -15,7 +15,8 @@
   "homepage": "https://dtwitter.heismauri.com",
   "scripts": {
     "start": "wrangler dev",
-    "test": "node --experimental-vm-modules --no-warnings node_modules/jest/bin/jest.js"
+    "build": "wrangler deploy --dry-run --outdir dist",
+    "test": "yarn build && node --experimental-vm-modules --no-warnings node_modules/jest/bin/jest.js"
   },
   "devDependencies": {
     "eslint": "8.48.0",
