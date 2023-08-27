@@ -2,15 +2,17 @@ import { Miniflare } from 'miniflare';
 import { FormData } from 'undici';
 
 const mf = new Miniflare({
-  scriptPath: 'worker.1.1.js',
+  scriptPath: 'dist/worker.js',
   envPath: '.dev.vars',
   modules: true,
-  port: 1811
+  port: 1811,
+  kvNamespaces: ['guest'],
+  kvPersist: true
 });
 
 const buildForm = (url, selector = false) => {
   const form = new FormData();
-  form.append('version', '4.0.0');
+  form.append('version', '4.1.0');
   form.append('url', url);
   form.append('selector', JSON.stringify({ selector }));
   return form;
@@ -49,7 +51,8 @@ test('Can download GIFs', async () => {
   expect(dtwitterAPI).toHaveProperty('media');
   expect(dtwitterAPI.media[0].type).toBe('animated_gif');
   expect(dtwitterAPI.media[0].link).toMatch(/video.twimg.com/);
-  expect(dtwitterAPI.media[0].thumbnail).toMatch(/tweet_video_thumb/);
+  expect(typeof dtwitterAPI.media[0].width).toBe('number');
+  expect(typeof dtwitterAPI.media[0].height).toBe('number');
 });
 
 test('Can download photos', async () => {
@@ -70,11 +73,11 @@ test('Can download tweets with mixed media', async () => {
   })
     .then((response) => response.json());
   expect(dtwitterAPI).toHaveProperty('media');
-  expect(dtwitterAPI.media.length).toBe(6);
-  expect(dtwitterAPI.media[0].type).toBe('video');
-  expect(dtwitterAPI.media[0].link).toMatch(/video.twimg.com/);
-  expect(dtwitterAPI.media[2].type).toBe('photo');
-  expect(dtwitterAPI.media[2].link).toMatch(/pbs.twimg.com/);
+  expect(dtwitterAPI.media.length).toBe(4);
+  expect(dtwitterAPI.media[0].type).toBe('photo');
+  expect(dtwitterAPI.media[0].link).toMatch(/pbs.twimg.com/);
+  expect(dtwitterAPI.media[1].type).toBe('video');
+  expect(dtwitterAPI.media[1].link).toMatch(/video.twimg.com/);
 });
 
 afterAll(async () => {
