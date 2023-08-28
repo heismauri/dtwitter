@@ -2,16 +2,23 @@ const formElement = document.getElementById('downloader-form');
 const mediaElement = document.getElementById('downloader-media');
 
 const urlValidator = async (url) => {
-  let mainURL = url;
-  if (/https:\/\/t.co/.test(mainURL)) {
-    mainURL = await fetch(`https://urlexpander.heismauri.com/?url=${mainURL}`)
-      .then((response) => response.json())
-      .then((data) => data.url);
+  try {
+    let mainURL = new URL(url).toString();
+    if (/https:\/\/t.co/.test(mainURL)) {
+      mainURL = await fetch(`https://urlexpander.heismauri.com/?url=${mainURL}`)
+        .then((response) => response.json())
+        .then((data) => data.url);
+    }
+    return {
+      success: /https:\/\/(twitter|x).com/.test(mainURL) && /\d{9,}/.test(mainURL),
+      url: mainURL
+    };
+  } catch (error) {
+    return {
+      success: false,
+      url
+    };
   }
-  return {
-    success: /https:\/\/twitter.com/.test(mainURL) && /\d{9,}/.test(mainURL),
-    url: mainURL
-  };
 };
 
 const dtwitterAPI = async (url) => {
