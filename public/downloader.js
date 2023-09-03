@@ -25,56 +25,65 @@ const dtwitterAPI = async (url) => {
   const downloaderForm = new FormData();
   downloaderForm.append('url', url);
   downloaderForm.append('version', currentVersion);
-  await fetch('/', {
+  const response = await fetch('/', {
     method: 'POST',
     body: downloaderForm
-  })
-    .then((response) => response.json())
-    .then((data) => {
-      mediaElement.innerHTML = '';
-      if (data.error) {
-        alert(data.error);
-      } else {
-        mediaElement.className = 'content';
-        data.media.forEach((element) => {
-          const htmlMedia = document.createElement('div');
-          htmlMedia.className = `media type-${element.type}`;
-          if (element.type === 'photo') {
-            htmlMedia.innerHTML = `
-            <a href="${element.link}" target="_blank"><img src="${element.link}"></a>
-            `;
-          } else {
-            htmlMedia.innerHTML = `
-            <a class="btn btn-save" href="${element.link}" target="_blank">Save video</a>
-            <video ${element.type === 'animated_gif' ? 'controls autoplay loop' : 'controls'}>
-              <source src="${element.link}" type="video/mp4">
-            </video>
-            `;
-          }
-          if (element.type === 'animated_gif') {
-            htmlMedia.innerHTML += `<p class="mb-0">You can convert this video into a GIF using <a href="https://ezgif.com/video-to-gif?url=${element.link}">EZGIF</a></p>`;
-          }
-          mediaElement.insertAdjacentElement('beforeend', htmlMedia);
-        });
-      }
-    });
+  });
+  if (!response.ok) {
+    const data = await response.json();
+    throw new Error(data.error);
+  }
+  return response.json();
+};
+
+const renderMediaElements = (data) => {
+  mediaElement.innerHTML = '';
+  mediaElement.className = 'content';
+  data.media.forEach((media) => {
+    const htmlMedia = document.createElement('div');
+    htmlMedia.className = `media type-${media.type}`;
+    if (media.type === 'photo') {
+      htmlMedia.innerHTML = `<a href="${media.link}" target="_blank"><img src="${media.link}"></a>`;
+    } else {
+      htmlMedia.innerHTML = `
+        <a class="btn btn-save" href="${media.link}" target="_blank">Save video</a>
+        <video controls ${media.type === 'animated_gif' ? 'autoplay loop' : ''}>
+          <source src="${media.link}" type="video/mp4">
+        </video>
+      `;
+    }
+    if (media.type === 'animated_gif') {
+      htmlMedia.innerHTML += `<p class="mb-0">You can convert this video into a GIF using <a href="https://ezgif.com/video-to-gif?url=${media.link}">EZGIF</a></p>`;
+    }
+    mediaElement.insertAdjacentElement('beforeend', htmlMedia);
+  });
 };
 
 formElement.addEventListener('submit', async (event) => {
   event.preventDefault();
   event.submitter.disabled = true;
+  const tweetURL = event.currentTarget.url.value;
+  if (!tweetURL) {
+    setTimeout(() => {
+      event.submitter.disabled = false;
+    }, '1000');
+    return;
+  }
   mediaElement.className = '';
   mediaElement.innerHTML = '<div class="ellipsis-loader"><div></div><div></div><div></div><div></div></div>';
-  const tweetURL = event.currentTarget.url.value;
   const { success: validUrl, url } = await urlValidator(tweetURL);
   if (!validUrl) {
-    const errorMessage = 'Please insert a valid URL';
+    const errorMessage = `Please insert a valid URL (${url})`;
     alert(errorMessage);
     mediaElement.innerHTML = '';
     event.submitter.disabled = false;
     throw new Error(errorMessage);
   }
-  await dtwitterAPI(url);
+  await dtwitterAPI(url)
+    .then(renderMediaElements)
+    .catch((error) => {
+      alert(error.message);
+    });
   setTimeout(() => {
     event.submitter.disabled = false;
   }, '2000');
