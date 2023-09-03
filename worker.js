@@ -54,7 +54,7 @@ const jsonResponseBuilder = (body, options = {}) => {
 
 // Check params
 const objectValidator = (object) => {
-  // Check if installed version is the lastest one
+  // Check if installed version is a supported one
   if (!object.version || !supportedVersions.includes(object.version)) {
     object.message = `Your current version is outdated. Please download the latest one on https://routinehub.co/shortcut/${shortcutId}/.`;
     return object;
