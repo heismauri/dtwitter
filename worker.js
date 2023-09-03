@@ -1,4 +1,4 @@
-import twitterAPIClient from './modules/twitter-api';
+import twitterAPIClient from './modules/twitter-api-client';
 import jsonBuilder from './modules/json-builder';
 import landingPage from './modules/landing-page';
 
