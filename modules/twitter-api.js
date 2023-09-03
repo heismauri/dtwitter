@@ -64,7 +64,7 @@ const twitterAPIClient = async (id, env, firstTry = true) => {
       return await twitterAPIClient(id, env, false);
     }
     const { tweetResult } = twitterGraphqlResponse.data;
-    if (Object.keys(tweetResult).length === 0 || !tweetResult.result) {
+    if (!Object.keys(tweetResult).length || !tweetResult.result) {
       throw new Error('notfound');
     }
     if (tweetResult.result.reason === 'NsfwLoggedOut') {
