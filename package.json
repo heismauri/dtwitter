@@ -14,11 +14,12 @@
   },
   "homepage": "https://dtwitter.heismauri.com",
   "scripts": {
-    "start": "wrangler dev",
+    "start": "wrangler dev --env dev",
     "build": "wrangler deploy --dry-run --outdir dist",
     "test": "yarn build && node --experimental-vm-modules --no-warnings node_modules/jest/bin/jest.js"
   },
   "devDependencies": {
+    "dotenv": "16.3.1",
     "eslint": "8.48.0",
     "eslint-config-airbnb-base": "15.0.0",
     "eslint-plugin-import": "2.28.1",

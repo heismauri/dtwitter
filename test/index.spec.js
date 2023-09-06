@@ -4,11 +4,15 @@ import { config } from 'dotenv';
 
 import { latestVersion } from '../modules/global-variables';
 
+config({ path: './.dev.vars' });
+const token = process.env.TOKEN;
+
 const mf = new Miniflare({
   scriptPath: 'dist/worker.js',
   envPath: '.dev.vars',
   modules: true,
   port: 1811,
+  bindings: { TOKEN: token },
   kvNamespaces: ['guest'],
   kvPersist: true
 });
