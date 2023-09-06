@@ -1,10 +1,7 @@
 import twitterAPIClient from './modules/twitter-api-client';
 import jsonBuilder from './modules/json-builder';
 import landingPage from './modules/landing-page';
-
-const shortcutId = '6166';
-const shortcutName = 'DTwitter';
-const supportedVersions = ['4.1.0'];
+import { shortcutURL, supportedVersions } from './modules/global-variables';
 
 // return Response with its corresponding Content-Type
 const jsonResponseBuilder = (body, options = {}) => {
@@ -20,7 +17,7 @@ const jsonResponseBuilder = (body, options = {}) => {
 const objectValidator = (object) => {
   // Check if installed version is a supported one
   if (!object.version || !supportedVersions.includes(object.version)) {
-    object.message = `Your current version is outdated. Please download the latest one on https://routinehub.co/shortcut/${shortcutId}/.`;
+    object.message = `Your current version is outdated. Please download the latest one on ${shortcutURL}.`;
     return object;
   }
   // Check for valid URL
@@ -28,21 +25,19 @@ const objectValidator = (object) => {
     object.message = 'The URL field is required and cannot be left blank.';
     return object;
   }
+  // Check for valid tweet ID
   if (!(/https:\/\/(twitter|x)\.com\/.*\/\d{18,}/.test(object.url))) {
     object.message = `The provided URL (${object.url}) is not valid.`;
     return object;
   }
-  // Check for valid tweet ID
-  const tweetID = object.url.match(/\d{18,}/);
-  if (!tweetID) {
-    object.message = 'The provided Tweet URL seems to have an invalid or missing Tweet ID.';
-    return object;
-  }
   // Save the id on params object
-  [object.id] = tweetID;
-  // Rewrite selector key to save the boolean from the dictionary
-  if (object.selector) {
-    object.selector = JSON.parse(object.selector).selector;
+  [object.id] = object.url.match(/\d{18,}/);
+  // Rewrite selector key to save the boolean from the dictionary, or accept a string selector like "true"
+  try {
+    const parsedSelector = JSON.parse(object.selector);
+    object.selector = Object.hasOwn(parsedSelector, 'selector') ? parsedSelector.selector : parsedSelector;
+  } catch (error) {
+    object.selector = false;
   }
   return object;
 };
