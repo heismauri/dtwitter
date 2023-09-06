@@ -1,7 +1,7 @@
+import { shortcutURL, supportedVersions } from './modules/global-variables';
 import twitterAPIClient from './modules/twitter-api-client';
 import jsonBuilder from './modules/json-builder';
 import landingPage from './modules/landing-page';
-import { shortcutURL, supportedVersions } from './modules/global-variables';
 
 // return Response with its corresponding Content-Type
 const jsonResponseBuilder = (body, options = {}) => {
@@ -26,7 +26,7 @@ const objectValidator = (object) => {
     return object;
   }
   // Check for valid tweet ID
-  if (!(/https:\/\/(twitter|x)\.com\/.*\/\d{18,}/.test(object.url))) {
+  if (!(/^https:\/\/(twitter|x)\.com\/[^/]+\/status\/\d{18,}/.test(object.url))) {
     object.message = `The provided URL (${object.url}) is not valid.`;
     return object;
   }
