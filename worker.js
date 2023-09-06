@@ -97,7 +97,7 @@ export default {
     if (request.method === 'POST') {
       return handlePostRequest(request, env);
     }
-    return new Response(landingPage(shortcutId, shortcutName, supportedVersions), {
+    return new Response(landingPage(), {
       headers: {
         'Content-Type': 'text/html; charset=UTF-8'
       },

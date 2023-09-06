@@ -1,4 +1,6 @@
-const landingPage = (shortcutId, shortcutName, supportedVersions) => {
+import { shortcutName, shortcutURL, latestVersion } from './global-variables';
+
+const landingPage = () => {
   const downcaseShortcutName = shortcutName.toLowerCase();
   const assetPath = 'https://www.heismauri.com/assets/shortcuts';
   const shortcutAssetPath = `${assetPath}/${downcaseShortcutName}`;
@@ -15,7 +17,7 @@ const landingPage = (shortcutId, shortcutName, supportedVersions) => {
         <link rel="stylesheet" rel="preload" as="style" href="${assetPath}/style.css">
         <script defer src="${shortcutAssetPath}/downloader.js"></script>
         <script>
-          const currentVersion = '${supportedVersions[supportedVersions.length - 1]}'
+          const currentVersion = '${latestVersion}'
         </script>
       </head>
       <body>
@@ -23,7 +25,7 @@ const landingPage = (shortcutId, shortcutName, supportedVersions) => {
           <header>
             <h1 class="py-4 m-0">${shortcutName}</h1>
             <img class="d-block mx-auto shortcut-icon" width="200" height="200" alt="${shortcutName}'s shortcut icon" srcset="${shortcutAssetPath}/icon-x2.png 2x, ${shortcutAssetPath}/icon-x3.png 3x" src="${shortcutAssetPath}/icon.png">
-            <p class="py-4 m-0">This API also works with the Siri Shortcut <strong>"${shortcutName}"</strong> which can be downloaded on <a href="https://routinehub.co/shortcut/${shortcutId}/">RoutineHub</a><i class="fa-solid fa-heart visually-hidden"></i></p>
+            <p class="py-4 m-0">This API also works with the Siri Shortcut <strong>"${shortcutName}"</strong> which can be downloaded on <a href="${shortcutURL}">RoutineHub</a><i class="fa-solid fa-heart visually-hidden"></i></p>
           </header>
           <p class="m-0"><i>The web downloader is still in Beta, make sure to report any errors!</i></p>
           <form id="downloader-form" class="form-group w-100 d-flex my-4" action="#">

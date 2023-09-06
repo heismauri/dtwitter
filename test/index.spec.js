@@ -1,5 +1,8 @@
 import { Miniflare } from 'miniflare';
 import { FormData } from 'undici';
+import { config } from 'dotenv';
+
+import { latestVersion } from '../modules/global-variables';
 
 const mf = new Miniflare({
   scriptPath: 'dist/worker.js',
@@ -12,7 +15,7 @@ const mf = new Miniflare({
 
 const buildForm = (url, selector = false) => {
   const form = new FormData();
-  form.append('version', '4.1.0');
+  form.append('version', latestVersion);
   form.append('url', url);
   form.append('selector', JSON.stringify({ selector }));
   return form;
