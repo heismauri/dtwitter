@@ -1,29 +1,30 @@
 import { Miniflare } from 'miniflare';
 import { FormData } from 'undici';
 import { config } from 'dotenv';
-
 import { latestVersion } from '../modules/global-variables';
 
 config({ path: './.dev.vars' });
+
+let mf;
 const token = process.env.TOKEN;
-
-const mf = new Miniflare({
-  scriptPath: 'dist/worker.js',
-  envPath: '.dev.vars',
-  modules: true,
-  port: 1811,
-  bindings: { TOKEN: token },
-  kvNamespaces: ['guest'],
-  kvPersist: true
-});
-
 const buildForm = (url, selector = false) => {
   const form = new FormData();
   form.append('version', latestVersion);
   form.append('url', url);
-  form.append('selector', JSON.stringify({ selector }));
+  form.append('selector', JSON.stringify(selector));
   return form;
 };
+
+beforeAll(() => {
+  mf = new Miniflare({
+    scriptPath: 'dist/worker.js',
+    modules: true,
+    port: 1811,
+    bindings: { TOKEN: token },
+    kvNamespaces: ['guest'],
+    kvPersist: true
+  });
+});
 
 test('Can download videos', async () => {
   const dtwitterAPI = await mf.dispatchFetch('http://localhost:1811', {
@@ -36,7 +37,20 @@ test('Can download videos', async () => {
   expect(dtwitterAPI.media[0].link).toMatch(/video.twimg.com/);
 });
 
-test('Can download videos with quality selector', async () => {
+test('Can download videos with quality selector as dictionary', async () => {
+  const dtwitterAPI = await mf.dispatchFetch('http://localhost:1811', {
+    method: 'POST',
+    body: buildForm('https://twitter.com/i/status/1333078270640795649', { selector: true })
+  })
+    .then((response) => response.json());
+  expect(dtwitterAPI).toHaveProperty('media');
+  expect(dtwitterAPI.media[0].type).toBe('selector');
+  expect(dtwitterAPI.media[0].link.high).toMatch(/1280x720/);
+  expect(dtwitterAPI.media[0].link.medium).toMatch(/640x360/);
+  expect(dtwitterAPI.media[0].link.low).toMatch(/480x270/);
+});
+
+test('Can download videos with quality selector as boolean', async () => {
   const dtwitterAPI = await mf.dispatchFetch('http://localhost:1811', {
     method: 'POST',
     body: buildForm('https://twitter.com/i/status/1333078270640795649', true)
