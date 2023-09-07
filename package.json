@@ -26,8 +26,8 @@
     "eslint-plugin-jest": "27.2.3",
     "jest": "29.6.4",
     "jest-environment-miniflare": "2.14.1",
-    "miniflare": "3.20230814.1",
+    "miniflare": "3.20230904.0",
     "undici": "5.20.0",
-    "wrangler": "3.6.0"
+    "wrangler": "3.7.0"
   }
 }
