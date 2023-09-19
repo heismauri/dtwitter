@@ -53,7 +53,11 @@ const renderMediaElements = (data) => {
       `;
     }
     if (media.type === 'animated_gif') {
-      htmlMedia.innerHTML += `<p class="mb-0">You can convert this video into a GIF using <a href="https://ezgif.com/video-to-gif?url=${media.link}">EZGIF</a></p>`;
+      htmlMedia.innerHTML += `
+        <p class="mb-0">You can convert this video into a GIF using
+          <a href="https://ezgif.com/video-to-gif?url=${media.link}" target="_blank">EZGIF</a>
+        </p>
+      `;
     }
     mediaElement.insertAdjacentElement('beforeend', htmlMedia);
   });
