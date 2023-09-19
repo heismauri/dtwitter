@@ -14,7 +14,7 @@
   },
   "homepage": "https://dtwitter.heismauri.com",
   "scripts": {
-    "start": "wrangler dev --env dev",
+    "start": "wrangler dev",
     "build": "wrangler deploy --dry-run --outdir dist",
     "test": "yarn build && node --experimental-vm-modules --no-warnings node_modules/jest/bin/jest.js"
   },
