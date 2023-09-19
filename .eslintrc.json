@@ -7,6 +7,10 @@
   "globals": {
     "guest": "readonly"
   },
+  "ignorePatterns": [
+    "deprecated/*.js",
+    "dist/*.js"
+  ],
   "parserOptions": {
     "ecmaVersion": 2020
   },
