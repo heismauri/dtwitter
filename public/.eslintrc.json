@@ -1,21 +1,30 @@
 {
-	"env": {
-		"browser": true
-	},
-	"extends": "airbnb-base",
+  "env": {
+    "browser": true
+  },
+  "extends": "airbnb-base",
   "globals": {
     "currentVersion": "readonly"
   },
-	"rules": {
+  "rules": {
     "arrow-body-style": "off",
-    "comma-dangle": ["warn", "never"],
+    "comma-dangle": [
+      "warn",
+      "never"
+    ],
+    "no-alert": "off",
     "no-console": "warn",
     "no-new-object": "off",
     "no-param-reassign": "off",
     "no-restricted-globals": "off",
     "no-unused-vars": "off",
-    "quote-props": ["error", "consistent"],
-    "quotes": ["error", "single"],
-    "no-alert": "off"
+    "quote-props": [
+      "error",
+      "consistent"
+    ],
+    "quotes": [
+      "error",
+      "single"
+    ]
   }
 }

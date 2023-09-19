@@ -1,26 +1,41 @@
 {
   "env": {
-    "worker": true,
-    "jest/globals": true
+    "jest/globals": true,
+    "worker": true
   },
+  "extends": "airbnb-base",
   "globals": {
     "guest": "readonly"
   },
-  "extends": "airbnb-base",
-  "plugins": [
-    "jest"
-  ],
   "parserOptions": {
     "ecmaVersion": 2020
   },
+  "plugins": [
+    "jest"
+  ],
   "rules": {
     "arrow-body-style": "off",
     "comma-dangle": "off",
+    "max-len": [
+      "error",
+      {
+        "code": 120,
+        "tabWidth": 2
+      }
+    ],
     "no-console": "warn",
     "no-param-reassign": "off",
     "no-restricted-globals": "off",
-    "quote-props": ["error", "consistent"],
-    "quotes": ["error", "single", { "avoidEscape": true }],
-    "max-len": ["error", { "code": 120, "tabWidth": 2, "ignoreTemplateLiterals": true, "ignoreStrings": true }]
+    "quote-props": [
+      "error",
+      "consistent"
+    ],
+    "quotes": [
+      "error",
+      "single",
+      {
+        "avoidEscape": true
+      }
+    ]
   }
 }
