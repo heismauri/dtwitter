@@ -1,6 +1,6 @@
 {
   "name": "dtwitter",
-  "version": "4.1.0",
+  "version": "4.1.1",
   "description": "Download photos, videos and HQ GIFs from a public tweet",
   "type": "module",
   "repository": {
