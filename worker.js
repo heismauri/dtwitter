@@ -79,7 +79,7 @@ const handlePostRequest = async (request, env) => {
       default:
         return jsonResponseBuilder(
           {
-            error: 'Twitter\'s API does not seem to be working right now. Please try again later. '
+            error: "Twitter's API does not seem to be working right now. Please try again later. "
             + 'Contact @heismauri on Twitter/X if the problem persists.'
           },
           { status: 503 }
