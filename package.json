@@ -16,7 +16,9 @@
   "scripts": {
     "start": "wrangler dev",
     "build": "wrangler deploy --dry-run --outdir dist",
-    "test": "yarn build && node --experimental-vm-modules --no-warnings node_modules/jest/bin/jest.js"
+    "test": "yarn build && node --experimental-vm-modules --no-warnings node_modules/jest/bin/jest.js",
+    "lint": "eslint . --ext .js",
+    "deploy": "yarn lint && yarn test && wrangler deploy"
   },
   "devDependencies": {
     "dotenv": "16.3.1",
