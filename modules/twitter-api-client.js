@@ -26,9 +26,10 @@ const paramsFieldToggles = {
   'withArticleRichContentState': false
 };
 
-const twitterHeaders = async (env) => {
+const generateTwitterHeaders = async (env) => {
   const guestToken = await getGuestToken(env);
   return {
+    'Accept': 'application/json',
     'Authorization': `Bearer ${env.TOKEN}`,
     'Origin': 'https://twitter.com',
     'Referer': 'https://twitter.com/',
@@ -48,22 +49,27 @@ const paramsVariables = (id) => {
 
 const twitterAPIClient = async (id, env, firstTry = true) => {
   try {
-    const twitterGraphqlHeaders = await twitterHeaders(env);
-    const twitterGraphql = new URL('https://api.twitter.com/graphql/3HC_X_wzxnMmUBRIn3MWpQ/TweetResultByRestId');
-    twitterGraphql.search = new URLSearchParams({
+    const twitterHeaders = await generateTwitterHeaders(env);
+    const twitterEndpoint = new URL('https://api.twitter.com/graphql/3HC_X_wzxnMmUBRIn3MWpQ/TweetResultByRestId');
+    twitterEndpoint.search = new URLSearchParams({
       'features': JSON.stringify(paramsFeatures),
       'fieldToggles': JSON.stringify(paramsFieldToggles),
       'variables': JSON.stringify(paramsVariables(id))
     });
-    const twitterGraphqlResponse = await fetch(twitterGraphql, {
-      headers: twitterGraphqlHeaders
+    const twitterResponse = await fetch(twitterEndpoint, {
+      headers: twitterHeaders
     })
-      .then((response) => response.json());
-    if (firstTry && twitterGraphqlResponse?.errors?.[0]?.message === 'Bad guest token') {
+      .then((response) => response.text());
+    if (firstTry && twitterResponse.includes('Rate limit exceeded')) {
       await twitterAPIGuestClient(env);
       return await twitterAPIClient(id, env, false);
     }
-    const { tweetResult } = twitterGraphqlResponse.data;
+    const twitterParsedResponse = JSON.parse(twitterResponse);
+    if (firstTry && twitterParsedResponse?.errors?.[0]?.message === 'Bad guest token') {
+      await twitterAPIGuestClient(env);
+      return await twitterAPIClient(id, env, false);
+    }
+    const { tweetResult } = twitterParsedResponse.data;
     if (!Object.keys(tweetResult).length || !tweetResult.result) {
       throw new Error('notfound');
     }
