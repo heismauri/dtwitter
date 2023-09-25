@@ -6,18 +6,17 @@ const twitterAPIGuestClient = async (env) => {
     }
   })
     .then((response) => response.json());
-  await env.guest.put('token', twitterGuestClient.guest_token, {
+  await env.data.put('token', twitterGuestClient.guest_token, {
     metadata: { timestamp: Date.now() }
   });
   return twitterGuestClient.guest_token;
 };
 
 const getGuestToken = async (env) => {
-  const cacheMaxAge = 30 * 60 * 1000;
-  const KVCache = await env.guest.getWithMetadata('token');
-  let { value: token } = KVCache;
-  const { metadata } = KVCache;
-  if (!token || Date.now() - metadata.timestamp >= cacheMaxAge) {
+  const tokenMaxAge = 30 * 60 * 1000;
+  const tokenKV = await env.data.getWithMetadata('token');
+  let { value: token } = tokenKV;
+  if (!token || Date.now() - tokenKV.metadata.timestamp >= tokenMaxAge) {
     token = await twitterAPIGuestClient(env);
   }
   return token;

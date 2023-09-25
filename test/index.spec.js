@@ -1,12 +1,20 @@
 import { Miniflare } from 'miniflare';
 import { FormData } from 'undici';
 import { config } from 'dotenv';
+
 import { latestVersion } from '../modules/global-variables';
 
 config({ path: './.dev.vars' });
-
-let mf;
 const token = process.env.TOKEN;
+const mf = new Miniflare({
+  scriptPath: 'dist/worker.js',
+  modules: true,
+  port: 1811,
+  bindings: { TOKEN: token },
+  kvNamespaces: ['data'],
+  kvPersist: true
+});
+
 const buildForm = (url, selector = false) => {
   const form = new FormData();
   form.append('version', latestVersion);
@@ -14,17 +22,6 @@ const buildForm = (url, selector = false) => {
   form.append('selector', JSON.stringify(selector));
   return form;
 };
-
-beforeAll(() => {
-  mf = new Miniflare({
-    scriptPath: 'dist/worker.js',
-    modules: true,
-    port: 1811,
-    bindings: { TOKEN: token },
-    kvNamespaces: ['guest'],
-    kvPersist: true
-  });
-});
 
 test('Can download videos', async () => {
   const dtwitterAPI = await mf.dispatchFetch('http://localhost:1811', {

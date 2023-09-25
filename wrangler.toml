@@ -5,5 +5,8 @@ workers_dev = false
 minify = true
 
 kv_namespaces = [
-  { binding = "guest", id = "716ee25bb65543c8aaa44c8d18de16cf", preview_id = "d69ca07021724fdfb3d758c07c487ce7" }
+  { binding = "data", id = "1839c632b63746acbb847ea3f037ca0c", preview_id = "df76d8aa5ee745809d32e650d0195f42" }
 ]
+
+[placement]
+mode = "smart"
