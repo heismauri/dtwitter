@@ -60,29 +60,31 @@ const twitterAPIClient = async (id, env, firstTry = true) => {
       headers: twitterHeaders
     })
       .then((response) => response.text());
-    if (firstTry && twitterResponse.includes('Rate limit exceeded')) {
-      await twitterAPIGuestClient(env);
-      return await twitterAPIClient(id, env, false);
+    if (twitterResponse.includes('Rate limit exceeded')) {
+      if (firstTry) {
+        await twitterAPIGuestClient(env);
+        return await twitterAPIClient(id, env, false);
+      }
+
+      throw new Error('RateLimit');
     }
     const twitterParsedResponse = JSON.parse(twitterResponse);
-    if (firstTry && twitterParsedResponse?.errors?.[0]?.message === 'Bad guest token') {
-      await twitterAPIGuestClient(env);
-      return await twitterAPIClient(id, env, false);
+    if (twitterParsedResponse?.errors?.[0]?.message === 'Bad guest token') {
+      if (firstTry) {
+        await twitterAPIGuestClient(env);
+        return await twitterAPIClient(id, env, false);
+      }
+
+      throw new Error('BadGuestToken');
     }
     const { tweetResult } = twitterParsedResponse.data;
-    if (!Object.keys(tweetResult).length || !tweetResult.result) {
-      throw new Error('notfound');
-    }
-    if (tweetResult.result.reason === 'NsfwLoggedOut') {
-      throw new Error('nsfw');
-    }
-    if (!tweetResult.result.legacy) {
-      throw new Error('notfound');
-    }
+    if (!Object.keys(tweetResult).length || !tweetResult.result) throw new Error('NotFound');
+    if (tweetResult.result.reason === 'NsfwLoggedOut') throw new Error('Nsfw');
+    if (!tweetResult.result.legacy) throw new Error('NotFound');
+
     const tweetContent = tweetResult.result.legacy;
-    if (!tweetContent.extended_entities?.media) {
-      throw new Error('empty');
-    }
+    if (!tweetContent.extended_entities?.media) throw new Error('NoMedia');
+
     return tweetContent.extended_entities.media;
   } catch (error) {
     return { error };

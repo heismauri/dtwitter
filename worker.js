@@ -61,17 +61,17 @@ const handlePostRequest = async (request, env) => {
   // Check if the API gave any errors
   if (twitterJSON.error) {
     switch (twitterJSON.error.message) {
-      case 'notfound':
+      case 'NotFound':
         return jsonResponseBuilder(
           { error: 'Sorry, the tweet you were looking for could not be found.' },
           { status: 404 }
         );
-      case 'nsfw':
+      case 'Nsfw':
         return jsonResponseBuilder(
           { error: 'Sorry, the download has failed due to the presence of NSFW content in the tweet.' },
           { status: 405 }
         );
-      case 'empty':
+      case 'NoMedia':
         return jsonResponseBuilder(
           { error: 'Sorry, no media could be found for the provided URL.' },
           { status: 404 }
