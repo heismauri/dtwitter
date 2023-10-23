@@ -4,9 +4,6 @@
     "worker": true
   },
   "extends": "airbnb-base",
-  "globals": {
-    "guest": "readonly"
-  },
   "ignorePatterns": [
     "deprecated/*.js",
     "dist/*.js"
