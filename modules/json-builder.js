@@ -19,7 +19,8 @@ const jsonBuilder = (json, isSelectorEnabled) => {
       // Video & GIFs
       const videoVariants = media.video_info.variants
         .filter((variant) => variant.bitrate !== undefined)
-        .sort((a, b) => a.bitrate - b.bitrate);
+        .sort((a, b) => a.bitrate - b.bitrate)
+        .slice(-3);
       // Quality selector
       if (isSelectorEnabled && mediaType === 'video') {
         const videoQualities = {
