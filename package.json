@@ -30,6 +30,6 @@
     "jest-environment-miniflare": "2.14.1",
     "miniflare": "3.20230918.0",
     "undici": "^5.22.1",
-    "wrangler": "3.9.0"
+    "wrangler": "3.20.0"
   }
 }
