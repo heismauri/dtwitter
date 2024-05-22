@@ -12,6 +12,13 @@
       "warn",
       "never"
     ],
+    "max-len": [
+      "error",
+      {
+        "code": 120,
+        "tabWidth": 2
+      }
+    ],
     "no-alert": "off",
     "no-console": "warn",
     "no-new-object": "off",
