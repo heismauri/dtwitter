@@ -26,7 +26,7 @@ const buildForm = (url, selector = false) => {
 test('Can download videos', async () => {
   const dtwitterAPI = await mf.dispatchFetch('http://localhost:1811', {
     method: 'POST',
-    body: buildForm('https://twitter.com/i/status/1333078270640795649')
+    body: buildForm('https://x.com/i/status/1333078270640795649')
   })
     .then((response) => response.json());
   expect(dtwitterAPI).toHaveProperty('media');
@@ -37,7 +37,7 @@ test('Can download videos', async () => {
 test('Can download videos with quality selector as dictionary', async () => {
   const dtwitterAPI = await mf.dispatchFetch('http://localhost:1811', {
     method: 'POST',
-    body: buildForm('https://twitter.com/i/status/1333078270640795649', { selector: true })
+    body: buildForm('https://x.com/i/status/1333078270640795649', { selector: true })
   })
     .then((response) => response.json());
   expect(dtwitterAPI).toHaveProperty('media');
@@ -50,7 +50,7 @@ test('Can download videos with quality selector as dictionary', async () => {
 test('Can download videos with quality selector as boolean', async () => {
   const dtwitterAPI = await mf.dispatchFetch('http://localhost:1811', {
     method: 'POST',
-    body: buildForm('https://twitter.com/i/status/1333078270640795649', true)
+    body: buildForm('https://x.com/i/status/1333078270640795649', true)
   })
     .then((response) => response.json());
   expect(dtwitterAPI).toHaveProperty('media');
@@ -63,7 +63,7 @@ test('Can download videos with quality selector as boolean', async () => {
 test('Can download GIFs', async () => {
   const dtwitterAPI = await mf.dispatchFetch('http://localhost:1811', {
     method: 'POST',
-    body: buildForm('https://twitter.com/i/status/1584980589396242432')
+    body: buildForm('https://x.com/i/status/1584980589396242432')
   })
     .then((response) => response.json());
   expect(dtwitterAPI).toHaveProperty('media');
@@ -76,7 +76,7 @@ test('Can download GIFs', async () => {
 test('Can download photos', async () => {
   const dtwitterAPI = await mf.dispatchFetch('http://localhost:1811', {
     method: 'POST',
-    body: buildForm('https://twitter.com/i/status/1331266329819623426')
+    body: buildForm('https://x.com/i/status/1331266329819623426')
   })
     .then((response) => response.json());
   expect(dtwitterAPI).toHaveProperty('media');
@@ -87,7 +87,7 @@ test('Can download photos', async () => {
 test('Can download tweets with mixed media', async () => {
   const dtwitterAPI = await mf.dispatchFetch('http://localhost:1811', {
     method: 'POST',
-    body: buildForm('https://twitter.com/i/status/1577282815250427907')
+    body: buildForm('https://x.com/i/status/1577282815250427907')
   })
     .then((response) => response.json());
   expect(dtwitterAPI).toHaveProperty('media');

@@ -31,8 +31,8 @@ const generateTwitterHeaders = async (env) => {
   return {
     'Accept': 'application/json',
     'Authorization': `Bearer ${env.TOKEN}`,
-    'Origin': 'https://twitter.com',
-    'Referer': 'https://twitter.com/',
+    'Origin': 'https://x.com',
+    'Referer': 'https://x.com/',
     'x-guest-token': String(guestToken),
     'x-twitter-active-user': 'yes'
   };
@@ -50,7 +50,7 @@ const paramsVariables = (id) => {
 const twitterAPIClient = async (id, env, firstTry = true) => {
   try {
     const twitterHeaders = await generateTwitterHeaders(env);
-    const twitterEndpoint = new URL('https://api.twitter.com/graphql/3HC_X_wzxnMmUBRIn3MWpQ/TweetResultByRestId');
+    const twitterEndpoint = new URL('https://api.x.com/graphql/3HC_X_wzxnMmUBRIn3MWpQ/TweetResultByRestId');
     twitterEndpoint.search = new URLSearchParams({
       'features': JSON.stringify(paramsFeatures),
       'fieldToggles': JSON.stringify(paramsFieldToggles),

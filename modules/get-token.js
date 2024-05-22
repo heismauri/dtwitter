@@ -1,5 +1,5 @@
 const twitterAPIGuestClient = async (env) => {
-  const twitterGuestClient = await fetch('https://api.twitter.com/1.1/guest/activate.json', {
+  const twitterGuestClient = await fetch('https://api.x.com/1.1/guest/activate.json', {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${env.TOKEN}`
