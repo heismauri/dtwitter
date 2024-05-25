@@ -8,5 +8,8 @@ kv_namespaces = [
   { binding = "data", id = "1839c632b63746acbb847ea3f037ca0c", preview_id = "df76d8aa5ee745809d32e650d0195f42" }
 ]
 
+[vars]
+MAINTENANCE = "false"
+
 [placement]
 mode = "smart"

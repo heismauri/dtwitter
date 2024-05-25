@@ -53,6 +53,12 @@ const formToObject = async (request) => {
 
 // Handle POST request
 const handlePostRequest = async (request, env) => {
+  if (env.MAINTENANCE === 'true') {
+    return jsonResponseBuilder(
+      { error: 'DTwitter is under maintenance. Find more at @heismauri on Twitter/X.' },
+      { status: 503 }
+    );
+  }
   const params = await formToObject(request);
   if (params.message) {
     return jsonResponseBuilder({ error: params.message }, { status: 400 });
