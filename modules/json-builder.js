@@ -24,7 +24,7 @@ const jsonBuilder = (json, isSelectorEnabled) => {
       // Quality selector
       if (isSelectorEnabled && mediaType === 'video') {
         const videoQualities = {
-          low: videoVariants[0].url,
+          low: videoVariants[0].url
         };
         // Append other qualities if available
         if (videoVariants[1] && videoVariants[1].url) videoQualities.medium = videoVariants[1].url;

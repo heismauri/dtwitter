@@ -23,7 +23,6 @@
     "no-console": "warn",
     "no-new-object": "off",
     "no-param-reassign": "off",
-    "no-restricted-globals": "off",
     "no-unused-vars": "off",
     "quote-props": [
       "error",
