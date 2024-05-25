@@ -6,10 +6,10 @@ import landingPage from './modules/landing-page';
 // return Response with its corresponding Content-Type
 const jsonResponseBuilder = (body, options = {}) => {
   return new Response(JSON.stringify(body), {
-    ...options,
     headers: {
       'Content-Type': 'application/json; charset=UTF-8'
-    }
+    },
+    ...options
   });
 };
 
@@ -93,7 +93,7 @@ const handlePostRequest = async (request, env) => {
     }
   }
   // Success
-  return jsonResponseBuilder(jsonBuilder(twitterJSON, params.selector), { status: 200 });
+  return jsonResponseBuilder(jsonBuilder(twitterJSON, params.selector));
 };
 
 export default {
