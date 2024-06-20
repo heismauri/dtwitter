@@ -1,6 +1,7 @@
 import { getGuestToken, twitterAPIGuestClient } from './get-token';
 
 const paramsFeatures = {
+  'c9s_tweet_anatomy_moderator_badge_enabled': true,
   'creator_subscriptions_tweet_preview_api_enabled': true,
   'freedom_of_speech_not_reach_fetch_enabled': true,
   'graphql_is_translatable_rweb_tweet_is_translatable_enabled': true,
@@ -12,6 +13,7 @@ const paramsFeatures = {
   'responsive_web_graphql_exclude_directive_enabled': true,
   'responsive_web_graphql_skip_user_profile_image_extensions_enabled': false,
   'responsive_web_graphql_timeline_navigation_enabled': true,
+  'responsive_web_home_pinned_timelines_enabled': true,
   'responsive_web_media_download_video_enabled': false,
   'responsive_web_twitter_article_tweet_consumption_enabled': false,
   'standardized_nudges_misinfo': true,
@@ -22,19 +24,21 @@ const paramsFeatures = {
   'view_counts_everywhere_api_enabled': true
 };
 
-const paramsFieldToggles = {
-  'withArticleRichContentState': false
-};
-
 const generateTwitterHeaders = async (env) => {
   const guestToken = await getGuestToken(env);
   return {
     'Accept': 'application/json',
+    'Accept-Language': 'en',
     'Authorization': `Bearer ${env.TOKEN}`,
+    'Content-Type': 'application/json',
     'Origin': 'https://x.com',
     'Referer': 'https://x.com/',
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 '
+      + 'Safari/537.36',
     'x-guest-token': String(guestToken),
-    'x-twitter-active-user': 'yes'
+    'x-twitter-active-user': 'yes',
+    'x-twitter-client-language': 'en',
+    'Cookie': `guest_id=${encodeURIComponent(`v1:${String(guestToken)}`)}`
   };
 };
 
@@ -50,16 +54,16 @@ const paramsVariables = (id) => {
 const twitterAPIClient = async (id, env, firstTry = true) => {
   try {
     const twitterHeaders = await generateTwitterHeaders(env);
-    const twitterEndpoint = new URL('https://api.x.com/graphql/3HC_X_wzxnMmUBRIn3MWpQ/TweetResultByRestId');
+    const twitterEndpoint = new URL('https://api.x.com/graphql/5GOHgZe-8U2j5sVHQzEm9A/TweetResultByRestId');
     twitterEndpoint.search = new URLSearchParams({
       'features': JSON.stringify(paramsFeatures),
-      'fieldToggles': JSON.stringify(paramsFieldToggles),
       'variables': JSON.stringify(paramsVariables(id))
     });
     const twitterResponse = await fetch(twitterEndpoint, {
       headers: twitterHeaders
     })
       .then((response) => response.text());
+    if (!twitterResponse) throw new Error('Blank');
     if (twitterResponse.includes('Rate limit exceeded')) {
       if (firstTry) {
         await twitterAPIGuestClient(env);
@@ -79,6 +83,7 @@ const twitterAPIClient = async (id, env, firstTry = true) => {
     }
     const { tweetResult } = twitterParsedResponse.data;
     if (!Object.keys(tweetResult).length || !tweetResult.result) throw new Error('NotFound');
+    if (tweetResult.result.reason === 'Protected') throw new Error('Protected');
     if (tweetResult.result.reason === 'NsfwLoggedOut') throw new Error('Nsfw');
     if (!tweetResult.result.legacy) throw new Error('NotFound');
 
