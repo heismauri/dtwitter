@@ -9,7 +9,7 @@
   "rules": {
     "arrow-body-style": "off",
     "comma-dangle": [
-      "warn",
+      "error",
       "never"
     ],
     "max-len": [
@@ -20,17 +20,28 @@
       }
     ],
     "no-alert": "off",
-    "no-console": "warn",
-    "no-new-object": "off",
+    "no-console": [
+      "error",
+      {
+        "allow": [
+          "warn",
+          "error"
+        ]
+      }
+    ],
     "no-param-reassign": "off",
-    "no-unused-vars": "off",
+    "no-unexpected-multiline": "error",
+    "no-unused-vars": "warn",
     "quote-props": [
       "error",
       "consistent"
     ],
     "quotes": [
       "error",
-      "single"
+      "single",
+      {
+        "avoidEscape": true
+      }
     ]
   }
 }

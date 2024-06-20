@@ -87,6 +87,7 @@ formElement.addEventListener('submit', async (event) => {
     .then(renderMediaElements)
     .catch((error) => {
       alert(error.message);
+      console.error(error);
     });
   setTimeout(() => {
     event.submitter.disabled = false;
