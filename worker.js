@@ -75,12 +75,17 @@ const handlePostRequest = async (request, env) => {
       case 'Nsfw':
         return jsonResponseBuilder(
           { error: 'Sorry, the download has failed due to the presence of NSFW content in the tweet.' },
-          { status: 405 }
+          { status: 403 }
+        );
+      case 'Protected':
+        return jsonResponseBuilder(
+          { error: 'Sorry, the tweet you are trying to access is private and cannot be viewed or downloaded.' },
+          { status: 403 }
         );
       case 'NoMedia':
         return jsonResponseBuilder(
           { error: 'Sorry, no media could be found for the provided URL.' },
-          { status: 404 }
+          { status: 422 }
         );
       default:
         return jsonResponseBuilder(
