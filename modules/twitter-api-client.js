@@ -1,4 +1,5 @@
 import { getGuestToken, twitterAPIGuestClient } from './get-token';
+import jsonBuilder from './json-builder';
 
 const paramsFeatures = {
   'c9s_tweet_anatomy_moderator_badge_enabled': true,
@@ -51,13 +52,47 @@ const paramsVariables = (id) => {
   };
 };
 
-const twitterAPIClient = async (id, env, firstTry = true) => {
+const validateTweetResponse = (twitterParsedResponse) => {
+  const { tweetResult } = twitterParsedResponse.data;
+  const tweetResultResult = tweetResult?.result;
+  const tweetTypename = tweetResultResult?.__typename;
+  if (!Object.keys(tweetResult).length || !tweetResultResult) throw new Error('NotFound');
+  if (tweetTypename === 'TweetUnavailable') {
+    switch (tweetResultResult.reason) {
+      case 'Suspended':
+      case 'Protected':
+      case 'NsfwLoggedOut':
+        throw new Error(tweetResultResult.reason);
+      default:
+        throw new Error('TweetUnavailable');
+    }
+  }
+  return { tweetResultResult, tweetTypename };
+};
+
+const extractMediaFromTweet = (tweetResultResult, tweetTypename) => {
+  let baseTweet = tweetResultResult.legacy;
+  let repostedTweet = baseTweet?.retweeted_status_result?.result?.legacy;
+  let quotedTweet = tweetResultResult?.quoted_status_result?.result?.legacy;
+
+  if (tweetTypename === 'TweetWithVisibilityResults') {
+    baseTweet = tweetResultResult?.tweet.legacy;
+    repostedTweet = baseTweet?.retweeted_status_result?.result?.tweet?.legacy;
+    quotedTweet = tweetResultResult?.tweet?.quoted_status_result?.result?.tweet?.legacy;
+  }
+
+  return (repostedTweet?.extended_entities?.media
+          || baseTweet?.extended_entities?.media
+          || quotedTweet?.extended_entities?.media);
+};
+
+const twitterAPIClient = async (params, env, firstTry = true) => {
   try {
     const twitterHeaders = await generateTwitterHeaders(env);
     const twitterEndpoint = new URL('https://api.x.com/graphql/5GOHgZe-8U2j5sVHQzEm9A/TweetResultByRestId');
     twitterEndpoint.search = new URLSearchParams({
       'features': JSON.stringify(paramsFeatures),
-      'variables': JSON.stringify(paramsVariables(id))
+      'variables': JSON.stringify(paramsVariables(params.id))
     });
     const twitterResponse = await fetch(twitterEndpoint, {
       headers: twitterHeaders
@@ -67,7 +102,7 @@ const twitterAPIClient = async (id, env, firstTry = true) => {
     if (twitterResponse.includes('Rate limit exceeded')) {
       if (firstTry) {
         await twitterAPIGuestClient(env);
-        return await twitterAPIClient(id, env, false);
+        return await twitterAPIClient(params, env, false);
       }
 
       throw new Error('RateLimit');
@@ -76,21 +111,17 @@ const twitterAPIClient = async (id, env, firstTry = true) => {
     if (twitterParsedResponse?.errors?.[0]?.message === 'Bad guest token') {
       if (firstTry) {
         await twitterAPIGuestClient(env);
-        return await twitterAPIClient(id, env, false);
+        return await twitterAPIClient(params, env, false);
       }
 
       throw new Error('BadGuestToken');
     }
-    const { tweetResult } = twitterParsedResponse.data;
-    if (!Object.keys(tweetResult).length || !tweetResult.result) throw new Error('NotFound');
-    if (tweetResult.result.reason === 'Protected') throw new Error('Protected');
-    if (tweetResult.result.reason === 'NsfwLoggedOut') throw new Error('Nsfw');
-    if (!tweetResult.result.legacy) throw new Error('NotFound');
 
-    const tweetContent = tweetResult.result.legacy;
-    if (!tweetContent.extended_entities?.media) throw new Error('NoMedia');
+    const { tweetResultResult, tweetTypename } = validateTweetResponse(twitterParsedResponse);
+    const tweetMedia = extractMediaFromTweet(tweetResultResult, tweetTypename);
+    if (!tweetMedia) throw new Error('NoMedia');
 
-    return tweetContent.extended_entities.media;
+    return jsonBuilder(tweetMedia, params.selector);
   } catch (error) {
     return { error };
   }

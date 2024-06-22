@@ -1,6 +1,5 @@
 import { shortcutURL, supportedVersions } from './modules/global-variables';
 import twitterAPIClient from './modules/twitter-api-client';
-import jsonBuilder from './modules/json-builder';
 import landingPage from './modules/landing-page';
 
 // return Response with its corresponding Content-Type
@@ -42,6 +41,7 @@ const objectValidator = (object) => {
   return object;
 };
 
+// Iterate through the form data and return an object
 const formToObject = async (request) => {
   try {
     const objectForm = Object.fromEntries(await request.formData());
@@ -63,7 +63,7 @@ const handlePostRequest = async (request, env) => {
   if (params.message) {
     return jsonResponseBuilder({ error: params.message }, { status: 400 });
   }
-  const twitterJSON = await twitterAPIClient(params.id, env);
+  const twitterJSON = await twitterAPIClient(params, env);
   // Check if the API gave any errors
   if (twitterJSON.error) {
     switch (twitterJSON.error.message) {
@@ -72,15 +72,21 @@ const handlePostRequest = async (request, env) => {
           { error: 'Sorry, the tweet you were looking for could not be found.' },
           { status: 404 }
         );
-      case 'Nsfw':
-        return jsonResponseBuilder(
-          { error: 'Sorry, the download has failed due to the presence of NSFW content in the tweet.' },
-          { status: 403 }
-        );
       case 'Protected':
         return jsonResponseBuilder(
           { error: 'Sorry, the tweet you are trying to access is private and cannot be viewed or downloaded.' },
           { status: 403 }
+        );
+      case 'NsfwLoggedOut':
+        return jsonResponseBuilder(
+          { error: 'Sorry, the download has failed due to the presence of NSFW content in the tweet.' },
+          { status: 403 }
+        );
+      case 'Suspended':
+      case 'TweetUnavailable':
+        return jsonResponseBuilder(
+          { error: 'Sorry, the tweet you are trying to access is unavailable.' },
+          { status: 410 }
         );
       case 'NoMedia':
         return jsonResponseBuilder(
@@ -91,14 +97,14 @@ const handlePostRequest = async (request, env) => {
         return jsonResponseBuilder(
           {
             error: "Twitter's API does not seem to be working right now. Please try again later. "
-            + 'Contact @heismauri on Twitter/X if the problem persists.'
+                   + 'Contact @heismauri on Twitter/X if the problem persists.'
           },
           { status: 503 }
         );
     }
   }
   // Success
-  return jsonResponseBuilder(jsonBuilder(twitterJSON, params.selector));
+  return jsonResponseBuilder(twitterJSON);
 };
 
 export default {
