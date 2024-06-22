@@ -98,6 +98,28 @@ test('Can download tweets with mixed media', async () => {
   expect(dtwitterAPI.media[1].link).toMatch(/video.twimg.com/);
 });
 
+test('Can download media from retweeted tweet', async () => {
+  const dtwitterAPI = await mf.dispatchFetch('http://localhost:1811', {
+    method: 'POST',
+    body: buildForm('https://x.com/i/status/1802530438973407295')
+  })
+    .then((response) => response.json());
+  expect(dtwitterAPI).toHaveProperty('media');
+  expect(dtwitterAPI.media[0].type).toBe('video');
+  expect(dtwitterAPI.media[0].link).toMatch(/video.twimg.com/);
+});
+
+test('Can download media from quoted tweet', async () => {
+  const dtwitterAPI = await mf.dispatchFetch('http://localhost:1811', {
+    method: 'POST',
+    body: buildForm('https://x.com/i/status/1799089472631423474')
+  })
+    .then((response) => response.json());
+  expect(dtwitterAPI).toHaveProperty('media');
+  expect(dtwitterAPI.media[0].type).toBe('photo');
+  expect(dtwitterAPI.media[0].link).toMatch(/pbs.twimg.com/);
+});
+
 afterAll(async () => {
   await mf.dispose();
 });
