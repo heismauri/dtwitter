@@ -1,4 +1,4 @@
-import { getGuestToken, twitterAPIGuestClient } from './get-token';
+import { getGuestToken } from './get-token';
 import jsonBuilder from './json-builder';
 
 const paramsFeatures = {
@@ -86,7 +86,8 @@ const extractMediaFromTweet = (tweetResultResult, tweetTypename) => {
           || quotedTweet?.extended_entities?.media);
 };
 
-const twitterAPIClient = async (params, env, firstTry = true) => {
+const twitterAPIClient = async (params, env) => {
+  let responseLog;
   try {
     const twitterHeaders = await generateTwitterHeaders(env);
     const twitterEndpoint = new URL('https://api.x.com/graphql/5GOHgZe-8U2j5sVHQzEm9A/TweetResultByRestId');
@@ -96,34 +97,20 @@ const twitterAPIClient = async (params, env, firstTry = true) => {
     });
     const twitterResponse = await fetch(twitterEndpoint, {
       headers: twitterHeaders
-    })
-      .then((response) => response.text());
-    if (!twitterResponse) throw new Error('Blank');
-    if (twitterResponse.includes('Rate limit exceeded')) {
-      if (firstTry) {
-        await twitterAPIGuestClient(env);
-        return await twitterAPIClient(params, env, false);
-      }
+    });
 
-      throw new Error('RateLimit');
-    }
-    const twitterParsedResponse = JSON.parse(twitterResponse);
-    if (twitterParsedResponse?.errors?.[0]?.message === 'Bad guest token') {
-      if (firstTry) {
-        await twitterAPIGuestClient(env);
-        return await twitterAPIClient(params, env, false);
-      }
+    if ([403, 429].includes(twitterResponse.status)) throw new Error('Rate Limit');
+    if ([404].includes(twitterResponse.status)) throw new Error('Blank');
 
-      throw new Error('BadGuestToken');
-    }
-
+    const twitterParsedResponse = JSON.parse(await twitterResponse.text());
+    responseLog = twitterParsedResponse;
     const { tweetResultResult, tweetTypename } = validateTweetResponse(twitterParsedResponse);
     const tweetMedia = extractMediaFromTweet(tweetResultResult, tweetTypename);
     if (!tweetMedia) throw new Error('NoMedia');
 
     return jsonBuilder(tweetMedia, params.selector);
   } catch (error) {
-    return { error };
+    return { status: 'error', error };
   }
 };
 

@@ -1,6 +1,7 @@
 // Build the response
 const jsonBuilder = (json, isSelectorEnabled) => {
   return {
+    status: 'success',
     media: json.map((media) => {
       let mediaTweet;
       const mediaType = media.type;

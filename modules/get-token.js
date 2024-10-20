@@ -13,7 +13,7 @@ const twitterAPIGuestClient = async (env) => {
 };
 
 const getGuestToken = async (env) => {
-  const tokenMaxAge = 30 * 60 * 1000;
+  const tokenMaxAge = 15 * 60 * 1000;
   const tokenKV = await env.data.getWithMetadata('token');
   let { value: token } = tokenKV;
   if (!token || Date.now() - tokenKV.metadata.timestamp >= tokenMaxAge) {
