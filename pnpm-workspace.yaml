@@ -4,3 +4,4 @@ allowBuilds:
 minimumReleaseAgeExclude:
   - miniflare@5.20260730.0-alpha
   - wrangler@4.118.0
+  - '@cloudflare/vitest-pool-workers@0.20.1'
