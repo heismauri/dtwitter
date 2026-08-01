@@ -1,7 +1,7 @@
-import { jsonBuilder } from "@/json-builder";
-import type { TweetMediaItem, TweetResultResult, TwitterGraphQLResponse } from "@/types/TwitterGraphQLResponse";
-import type { TwitterApiResult } from "@/types/TwitterApiResult";
-import type { ValidatedParams } from "@/types/ValidatedParams";
+import { jsonBuilder } from "@api/json-builder";
+import type { TweetMediaItem, TweetResultResult, TwitterGraphQLResponse } from "@api/types/TwitterGraphQLResponse";
+import type { TwitterApiResult } from "@api/types/TwitterApiResult";
+import type { ValidatedParams } from "@api/types/ValidatedParams";
 
 const paramsFeatures = {
   "c9s_tweet_anatomy_moderator_badge_enabled": true,

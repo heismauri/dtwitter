@@ -1,4 +1,4 @@
-import { shortcutName, shortcutURL, latestVersion } from "@/global-variables";
+import { shortcutName, shortcutURL, latestVersion } from "@api/global-variables";
 
 const landingPage = (): string => {
   const downcaseShortcutName = shortcutName.toLowerCase();

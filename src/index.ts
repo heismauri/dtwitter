@@ -1,7 +1,7 @@
-import { shortcutURL, supportedVersions } from "@/global-variables";
-import { twitterAPIClient } from "@/services/Twitter";
-import { landingPage } from "@/landing-page";
-import type { ValidatedParams } from "@/types/ValidatedParams";
+import { shortcutURL, supportedVersions } from "@api/global-variables";
+import { twitterAPIClient } from "@api/services/Twitter";
+import { landingPage } from "@api/landing-page";
+import type { ValidatedParams } from "@api/types/ValidatedParams";
 
 // return Response with its corresponding Content-Type
 const jsonResponseBuilder = (body: unknown, options: ResponseInit = {}): Response => {

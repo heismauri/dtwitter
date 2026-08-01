@@ -13,8 +13,10 @@
     "isolatedModules": true,
     "noEmit": true,
     "paths": {
-      "@/*": ["./src/*"]
+      "@api/*": ["./src/*"],
+      "@app/*": ["./app/src/*"]
     }
   },
-  "include": ["src/**/*.ts"]
+  "exclude": ["test"],
+  "include": ["worker-configuration.d.ts", "src/**/*.ts"]
 }

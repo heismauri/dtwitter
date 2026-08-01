@@ -1,9 +1,9 @@
-import worker from "@/index";
+import worker from "@api/index";
 import { env } from "cloudflare:workers";
 import { expect, test } from "vitest";
 
-import { latestVersion } from "@/global-variables";
-import type { JsonBuilderResult, PhotoMedia, VideoMedia, SelectorMedia } from "@/types/MediaResult";
+import { latestVersion } from "@api/global-variables";
+import type { JsonBuilderResult, PhotoMedia, VideoMedia, SelectorMedia } from "@api/types/MediaResult";
 
 const buildForm = (url: string, selector: boolean | { selector: boolean } = false): FormData => {
   const form = new FormData();

@@ -1,3 +1,3 @@
-import type { JsonBuilderResult } from "@/types/MediaResult";
+import type { JsonBuilderResult } from "@api/types/MediaResult";
 
 export type TwitterApiResult = JsonBuilderResult | { status: "error"; error: Error };

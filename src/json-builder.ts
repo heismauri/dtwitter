@@ -1,5 +1,5 @@
-import type { TweetMediaItem } from "@/types/TwitterGraphQLResponse";
-import type { JsonBuilderResult, MediaResult, VideoMedia } from "@/types/MediaResult";
+import type { TweetMediaItem } from "@api/types/TwitterGraphQLResponse";
+import type { JsonBuilderResult, MediaResult, VideoMedia } from "@api/types/MediaResult";
 
 // Build the response
 const jsonBuilder = (json: TweetMediaItem[], isSelectorEnabled: boolean | string | undefined): JsonBuilderResult => {
