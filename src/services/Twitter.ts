@@ -104,7 +104,8 @@ const extractMediaFromTweet = (
   let quotedTweet = tweetResultResult?.quoted_status_result?.result?.legacy;
 
   if (tweetTypename === "TweetWithVisibilityResults") {
-    baseTweet = tweetResultResult?.tweet!.legacy;
+    if (!tweetResultResult.tweet) throw new Error("TweetUnavailable");
+    baseTweet = tweetResultResult.tweet.legacy;
     repostedTweet = baseTweet?.retweeted_status_result?.result?.tweet?.legacy;
     quotedTweet = tweetResultResult?.tweet?.quoted_status_result?.result?.tweet?.legacy;
   }

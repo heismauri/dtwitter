@@ -13,12 +13,13 @@ const buildForm = (url: string, selector: boolean | { selector: boolean } = fals
   return form;
 };
 
-const dispatch = (url: string, selector?: boolean | { selector: boolean }): Promise<JsonBuilderResult> => {
+const dispatch = async (url: string, selector?: boolean | { selector: boolean }): Promise<JsonBuilderResult> => {
   const request = new Request("http://localhost/", {
     method: "POST",
     body: buildForm(url, selector)
   });
-  return worker.fetch(request, env).then((response) => response.json<JsonBuilderResult>());
+  const response = await worker.fetch(request, env);
+  return response.json<JsonBuilderResult>();
 };
 
 test("Can download videos", async () => {

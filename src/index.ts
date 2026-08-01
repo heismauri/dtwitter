@@ -31,7 +31,12 @@ const objectValidator = (object: ValidatedParams): ValidatedParams => {
     return object;
   }
   // Save the id on params object
-  [object.id] = object.url.match(/\d{18,}/)!;
+  const idMatch = object.url.match(/\d{18,}/);
+  if (!idMatch) {
+    object.message = `The provided URL (${object.url}) is not valid.`;
+    return object;
+  }
+  [object.id] = idMatch;
   // Rewrite selector key to save the boolean from the dictionary, or accept a string selector like "true"
   try {
     const parsedSelector = JSON.parse(object.selector as string);

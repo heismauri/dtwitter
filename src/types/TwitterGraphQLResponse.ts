@@ -2,7 +2,7 @@ export interface TweetMediaItem {
   type: "photo" | "video" | "animated_gif";
   media_url_https: string;
   video_info?: {
-    variants: Array<{ bitrate?: number; url: string }>;
+    variants: { bitrate?: number; url: string }[];
   };
   sizes?: {
     large: { w: number; h: number };
