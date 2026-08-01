@@ -1,5 +1,6 @@
 .wrangler/
 dist/
+app/dist/
 node_modules
 
 .DS_Store
