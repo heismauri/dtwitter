@@ -16,11 +16,12 @@
   "packageManager": "pnpm@11.18.0",
   "scripts": {
     "start": "wrangler dev",
+    "dev": "wrangler dev",
     "build": "wrangler deploy --dry-run --outdir dist",
-    "test": "vitest run",
+    "test": "vitest",
     "lint": "eslint .",
-    "types": "wrangler types --strict-vars=false",
-    "deploy": "pnpm lint && pnpm test && wrangler deploy"
+    "cf-typegen": "wrangler types --strict-vars=false",
+    "deploy": "tsc && eslint . && vitest run && wrangler deploy"
   },
   "devDependencies": {
     "@cloudflare/vitest-pool-workers": "0.20.1",

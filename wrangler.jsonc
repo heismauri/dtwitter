@@ -1,11 +1,8 @@
 {
-  "$schema": "./node_modules/wrangler/config-schema.json",
-  "name": "dtwitter",
-  "main": "src/index.ts",
+  "$schema": "node_modules/wrangler/config-schema.json",
   // Set this to today's date
   "compatibility_date": "2026-07-31",
-  "workers_dev": false,
-  "minify": true,
+  "keep_vars": true,
   "kv_namespaces": [
     {
       "binding": "data",
@@ -13,16 +10,24 @@
       "preview_id": "df76d8aa5ee745809d32e650d0195f42"
     }
   ],
-  "vars": {
-    "MAINTENANCE": "false"
+  "limits": {
+    "cpu_ms": 10
   },
-  "secrets": {
-    "required": ["TOKEN"]
+  "main": "src/index.ts",
+  "minify": true,
+  "name": "dtwitter",
+  "observability": {
+    "enabled": true
   },
   "placement": {
     "mode": "smart"
   },
-  "limits": {
-    "cpu_ms": 10
-  }
+  "preview_urls": false,
+  "secrets": {
+    "required": ["TOKEN"]
+  },
+  "vars": {
+    "MAINTENANCE": "false"
+  },
+  "workers_dev": false
 }
