@@ -1,0 +1,25 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "dtwitter",
+  "main": "worker.js",
+  // Set this to today's date
+  "compatibility_date": "2026-07-31",
+  "workers_dev": false,
+  "minify": true,
+  "kv_namespaces": [
+    {
+      "binding": "data",
+      "id": "1839c632b63746acbb847ea3f037ca0c",
+      "preview_id": "df76d8aa5ee745809d32e650d0195f42"
+    }
+  ],
+  "vars": {
+    "MAINTENANCE": "false"
+  },
+  "placement": {
+    "mode": "smart"
+  },
+  "limits": {
+    "cpu_ms": 10
+  }
+}
