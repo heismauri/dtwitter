@@ -1,9 +1,10 @@
 import { shortcutURL, supportedVersions } from './modules/global-variables';
 import twitterAPIClient from './modules/twitter-api-client';
 import landingPage from './modules/landing-page';
+import type { ValidatedParams } from './modules/types';
 
 // return Response with its corresponding Content-Type
-const jsonResponseBuilder = (body, options = {}) => {
+const jsonResponseBuilder = (body: unknown, options: ResponseInit = {}): Response => {
   return new Response(JSON.stringify(body), {
     headers: {
       'Content-Type': 'application/json; charset=UTF-8'
@@ -13,7 +14,7 @@ const jsonResponseBuilder = (body, options = {}) => {
 };
 
 // Check params
-const objectValidator = (object) => {
+const objectValidator = (object: ValidatedParams): ValidatedParams => {
   // Check if installed version is a supported one
   if (!object.version || !supportedVersions.includes(object.version)) {
     object.message = `Your current version is outdated. Please download the latest one on ${shortcutURL}.`;
@@ -30,29 +31,29 @@ const objectValidator = (object) => {
     return object;
   }
   // Save the id on params object
-  [object.id] = object.url.match(/\d{18,}/);
+  [object.id] = object.url.match(/\d{18,}/)!;
   // Rewrite selector key to save the boolean from the dictionary, or accept a string selector like "true"
   try {
-    const parsedSelector = JSON.parse(object.selector);
+    const parsedSelector = JSON.parse(object.selector as string);
     object.selector = Object.hasOwn(parsedSelector, 'selector') ? parsedSelector.selector : parsedSelector;
-  } catch (error) {
+  } catch {
     object.selector = false;
   }
   return object;
 };
 
 // Iterate through the form data and return an object
-const formToObject = async (request) => {
+const formToObject = async (request: Request): Promise<ValidatedParams> => {
   try {
-    const objectForm = Object.fromEntries(await request.formData());
+    const objectForm = Object.fromEntries(await request.formData()) as unknown as ValidatedParams;
     return objectValidator(objectForm);
-  } catch (error) {
+  } catch {
     return { message: 'There was an error processing the form data.' };
   }
 };
 
 // Handle POST request
-const handlePostRequest = async (request, env) => {
+const handlePostRequest = async (request: Request, env: Env): Promise<Response> => {
   if (env.MAINTENANCE === 'true') {
     return jsonResponseBuilder(
       { error: 'DTwitter is under maintenance. Find more at @heismauri on Twitter/X.' },
@@ -65,7 +66,7 @@ const handlePostRequest = async (request, env) => {
   }
   const twitterJSON = await twitterAPIClient(params, env);
   // Check if the API gave any errors
-  if (twitterJSON.error) {
+  if (twitterJSON.status === 'error') {
     switch (twitterJSON.error.message) {
       case 'NotFound':
         return jsonResponseBuilder(
@@ -108,7 +109,7 @@ const handlePostRequest = async (request, env) => {
 };
 
 export default {
-  fetch(request, env) {
+  fetch(request: Request, env: Env): Response | Promise<Response> {
     if (request.method === 'POST') {
       return handlePostRequest(request, env);
     }
@@ -118,4 +119,4 @@ export default {
       }
     });
   }
-};
+} satisfies ExportedHandler<Env>;

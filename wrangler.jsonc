@@ -1,7 +1,7 @@
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
   "name": "dtwitter",
-  "main": "worker.js",
+  "main": "src/index.ts",
   // Set this to today's date
   "compatibility_date": "2026-07-31",
   "workers_dev": false,
@@ -15,6 +15,9 @@
   ],
   "vars": {
     "MAINTENANCE": "false"
+  },
+  "secrets": {
+    "required": ["TOKEN"]
   },
   "placement": {
     "mode": "smart"

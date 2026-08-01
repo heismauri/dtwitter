@@ -1,5 +1,8 @@
 import { getGuestToken } from './get-token';
 import jsonBuilder from './json-builder';
+import type {
+  ValidatedParams, TweetResultResult, TwitterGraphQLResponse, TwitterApiResult
+} from './types';
 
 const paramsFeatures = {
   'c9s_tweet_anatomy_moderator_badge_enabled': true,
@@ -25,7 +28,7 @@ const paramsFeatures = {
   'view_counts_everywhere_api_enabled': true
 };
 
-const generateTwitterHeaders = async (env) => {
+const generateTwitterHeaders = async (env: Env): Promise<Record<string, string>> => {
   const guestToken = await getGuestToken(env);
   return {
     'Accept': 'application/json',
@@ -36,14 +39,14 @@ const generateTwitterHeaders = async (env) => {
     'Referer': 'https://x.com/',
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 '
       + 'Safari/537.36',
-    'x-guest-token': String(guestToken),
+    'x-guest-token': guestToken,
     'x-twitter-active-user': 'yes',
     'x-twitter-client-language': 'en',
-    'Cookie': `guest_id=${encodeURIComponent(`v1:${String(guestToken)}`)}`
+    'Cookie': `guest_id=${encodeURIComponent(`v1:${guestToken}`)}`
   };
 };
 
-const paramsVariables = (id) => {
+const paramsVariables = (id: string | undefined) => {
   return {
     'includePromotedContent': false,
     'tweetId': String(id),
@@ -52,7 +55,7 @@ const paramsVariables = (id) => {
   };
 };
 
-const validateTweetResponse = (twitterParsedResponse) => {
+const validateTweetResponse = (twitterParsedResponse: TwitterGraphQLResponse) => {
   const { tweetResult } = twitterParsedResponse.data;
   const tweetResultResult = tweetResult?.result;
   const tweetTypename = tweetResultResult?.__typename;
@@ -70,13 +73,13 @@ const validateTweetResponse = (twitterParsedResponse) => {
   return { tweetResultResult, tweetTypename };
 };
 
-const extractMediaFromTweet = (tweetResultResult, tweetTypename) => {
+const extractMediaFromTweet = (tweetResultResult: TweetResultResult, tweetTypename: string | undefined) => {
   let baseTweet = tweetResultResult.legacy;
   let repostedTweet = baseTweet?.retweeted_status_result?.result?.legacy;
   let quotedTweet = tweetResultResult?.quoted_status_result?.result?.legacy;
 
   if (tweetTypename === 'TweetWithVisibilityResults') {
-    baseTweet = tweetResultResult?.tweet.legacy;
+    baseTweet = tweetResultResult?.tweet!.legacy;
     repostedTweet = baseTweet?.retweeted_status_result?.result?.tweet?.legacy;
     quotedTweet = tweetResultResult?.tweet?.quoted_status_result?.result?.tweet?.legacy;
   }
@@ -86,15 +89,16 @@ const extractMediaFromTweet = (tweetResultResult, tweetTypename) => {
           || quotedTweet?.extended_entities?.media);
 };
 
-const twitterAPIClient = async (params, env) => {
-  let responseLog;
+const twitterAPIClient = async (params: ValidatedParams, env: Env): Promise<TwitterApiResult> => {
+  let responseLog: TwitterGraphQLResponse | undefined;
+  let status: number | undefined;
   try {
     const twitterHeaders = await generateTwitterHeaders(env);
     const twitterEndpoint = new URL('https://api.x.com/graphql/5GOHgZe-8U2j5sVHQzEm9A/TweetResultByRestId');
     twitterEndpoint.search = new URLSearchParams({
       'features': JSON.stringify(paramsFeatures),
       'variables': JSON.stringify(paramsVariables(params.id))
-    });
+    }).toString();
     const twitterResponse = await fetch(twitterEndpoint, {
       headers: twitterHeaders
     });
@@ -102,14 +106,29 @@ const twitterAPIClient = async (params, env) => {
     if ([403, 429].includes(twitterResponse.status)) throw new Error('Rate Limit');
     if ([404].includes(twitterResponse.status)) throw new Error('Blank');
 
-    const twitterParsedResponse = JSON.parse(await twitterResponse.text());
+    const twitterParsedResponse: TwitterGraphQLResponse = JSON.parse(await twitterResponse.text());
     responseLog = twitterParsedResponse;
+    status = twitterResponse.status;
     const { tweetResultResult, tweetTypename } = validateTweetResponse(twitterParsedResponse);
     const tweetMedia = extractMediaFromTweet(tweetResultResult, tweetTypename);
     if (!tweetMedia) throw new Error('NoMedia');
 
     return jsonBuilder(tweetMedia, params.selector);
-  } catch (error) {
+  } catch (caughtError) {
+    const error = caughtError instanceof Error ? caughtError : new Error(String(caughtError));
+    const knownErrors = ['Rate Limit', 'Blank', 'NotFound', 'NoMedia', 'Suspended', 'Protected', 'NsfwLoggedOut'];
+    if (!(knownErrors.includes(error.message))) {
+      const dataErrorsKV = await env.data.get('errors');
+      const errors = dataErrorsKV ? JSON.parse(dataErrorsKV) : [];
+      errors.push({
+        id: params.id,
+        status,
+        error: error.message,
+        response: responseLog,
+        timestamp: new Date()
+      });
+      await env.data.put('errors', JSON.stringify(errors));
+    }
     return { status: 'error', error };
   }
 };
