@@ -1,4 +1,3 @@
-import { fileURLToPath } from "url";
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 
@@ -6,10 +5,7 @@ export default defineConfig({
   plugins: [react()],
   root: "app",
   resolve: {
-    alias: {
-      "@api": fileURLToPath(new URL("./src", import.meta.url)),
-      "@app": fileURLToPath(new URL("./app/src", import.meta.url))
-    }
+    tsconfigPaths: true
   },
   server: {
     proxy: {
