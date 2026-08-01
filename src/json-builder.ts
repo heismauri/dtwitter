@@ -1,18 +1,17 @@
-import type {
-  TweetMediaItem, MediaResult, VideoMedia, JsonBuilderResult
-} from './types';
+import type { TweetMediaItem } from "@/types/TwitterGraphQLResponse";
+import type { JsonBuilderResult, MediaResult, VideoMedia } from "@/types/MediaResult";
 
 // Build the response
 const jsonBuilder = (json: TweetMediaItem[], isSelectorEnabled: boolean | string | undefined): JsonBuilderResult => {
   return {
-    status: 'success',
+    status: "success",
     media: json.map((media): MediaResult => {
       const mediaType = media.type;
       // Photos
-      if (mediaType === 'photo') {
+      if (mediaType === "photo") {
         const [extension] = media.media_url_https.match(/\.[a-z]+$/gi)!;
-        const photoLink = media.media_url_https.replace(extension, '');
-        const photoExtension = extension.replace('.', '');
+        const photoLink = media.media_url_https.replace(extension, "");
+        const photoExtension = extension.replace(".", "");
         const finalPhotoLink = `${photoLink}?format=${photoExtension}&name=orig`;
         return {
           type: mediaType,
@@ -25,7 +24,7 @@ const jsonBuilder = (json: TweetMediaItem[], isSelectorEnabled: boolean | string
         .sort((a, b) => a.bitrate! - b.bitrate!)
         .slice(-3);
       // Quality selector
-      if (isSelectorEnabled && mediaType === 'video') {
+      if (isSelectorEnabled && mediaType === "video") {
         const videoQualities: { low: string; medium?: string; high?: string } = {
           low: videoVariants[0]!.url
         };
@@ -33,7 +32,7 @@ const jsonBuilder = (json: TweetMediaItem[], isSelectorEnabled: boolean | string
         if (videoVariants[1]?.url) videoQualities.medium = videoVariants[1]!.url;
         if (videoVariants[2]?.url) videoQualities.high = videoVariants[2]!.url;
         return {
-          type: 'selector',
+          type: "selector",
           link: videoQualities
         };
       }
@@ -43,7 +42,7 @@ const jsonBuilder = (json: TweetMediaItem[], isSelectorEnabled: boolean | string
         link: videoVariants[videoVariants.length - 1]!.url
       };
       // Only return sizes for GIFs
-      if (mediaType === 'animated_gif') {
+      if (mediaType === "animated_gif") {
         mediaTweet.width = media.sizes!.large.w;
         mediaTweet.height = media.sizes!.large.h;
       }
@@ -52,4 +51,4 @@ const jsonBuilder = (json: TweetMediaItem[], isSelectorEnabled: boolean | string
   };
 };
 
-export default jsonBuilder;
+export { jsonBuilder };

@@ -1,8 +1,8 @@
-import { shortcutName, shortcutURL, latestVersion } from './global-variables';
+import { shortcutName, shortcutURL, latestVersion } from "@/global-variables";
 
 const landingPage = (): string => {
   const downcaseShortcutName = shortcutName.toLowerCase();
-  const assetPath = 'https://www.heismauri.com/assets/shortcuts';
+  const assetPath = "https://www.heismauri.com/assets/shortcuts";
   const shortcutAssetPath = `${assetPath}/${downcaseShortcutName}`;
   return `
     <!DOCTYPE html>
@@ -52,4 +52,4 @@ const landingPage = (): string => {
   `;
 };
 
-export default landingPage;
+export { landingPage };
