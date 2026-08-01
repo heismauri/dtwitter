@@ -1,6 +1,5 @@
 import { shortcutURL, supportedVersions } from "@api/global-variables";
 import { twitterAPIClient } from "@api/services/Twitter";
-import { landingPage } from "@api/landing-page";
 import type { ValidatedParams } from "@api/types/ValidatedParams";
 
 // return Response with its corresponding Content-Type
@@ -118,10 +117,6 @@ export default {
     if (request.method === "POST") {
       return handlePostRequest(request, env);
     }
-    return new Response(landingPage(), {
-      headers: {
-        "Content-Type": "text/html; charset=UTF-8"
-      }
-    });
+    return env.ASSETS.fetch(request);
   }
 } satisfies ExportedHandler<Env>;

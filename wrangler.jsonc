@@ -1,5 +1,11 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
+  "assets": {
+    "binding": "ASSETS",
+    "directory": "./app/dist",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": true
+  },
   // Set this to today's date
   "compatibility_date": "2026-07-31",
   "keep_vars": true,
@@ -18,9 +24,6 @@
   "name": "dtwitter",
   "observability": {
     "enabled": true
-  },
-  "placement": {
-    "mode": "smart"
   },
   "preview_urls": false,
   "secrets": {
