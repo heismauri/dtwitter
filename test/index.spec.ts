@@ -1,5 +1,6 @@
 import worker from "@api/index";
-import { createExecutionContext, env, waitOnExecutionContext } from "cloudflare:test";
+import { createExecutionContext, waitOnExecutionContext } from "cloudflare:test";
+import { env } from "cloudflare:workers";
 import { expect, test } from "vitest";
 
 import { latestVersion } from "@api/global-variables";
