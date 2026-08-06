@@ -29,3 +29,8 @@ export interface TwitterGraphQLResponse {
     tweetResult: { result?: TweetResultResult };
   };
 }
+
+export interface SyndicationResponse {
+  mediaDetails?: TweetMediaItem[];
+  quoted_tweet?: { mediaDetails?: TweetMediaItem[] };
+}

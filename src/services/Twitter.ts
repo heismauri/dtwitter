@@ -1,5 +1,10 @@
 import { jsonBuilder } from "@api/json-builder";
-import type { TweetMediaItem, TweetResultResult, TwitterGraphQLResponse } from "@api/types/TwitterGraphQLResponse";
+import type {
+  SyndicationResponse,
+  TweetMediaItem,
+  TweetResultResult,
+  TwitterGraphQLResponse
+} from "@api/types/TwitterGraphQLResponse";
 import type { TwitterApiResult } from "@api/types/TwitterApiResult";
 import type { ValidatedParams } from "@api/types/ValidatedParams";
 
@@ -117,28 +122,55 @@ const extractMediaFromTweet = (
   );
 };
 
+// Twitter's syndication endpoint, used as a fallback when the GraphQL fails
+const generateSyndicationToken = (id: string): string => {
+  return ((Number(id) / 1e15) * Math.PI).toString(36).replace(/(0+|\.)/g, "");
+};
+
+const fetchSyndicationMedia = async (id: string): Promise<TweetMediaItem[] | undefined> => {
+  const syndicationEndpoint = new URL("https://cdn.syndication.twimg.com/tweet-result");
+  syndicationEndpoint.searchParams.set("id", id);
+  syndicationEndpoint.searchParams.set("token", generateSyndicationToken(id));
+  const syndicationResponse = await fetch(syndicationEndpoint, {
+    headers: { "User-Agent": "Googlebot" }
+  });
+
+  if ([403, 429].includes(syndicationResponse.status)) throw new Error("Rate Limit");
+  if ([404].includes(syndicationResponse.status)) throw new Error("Blank");
+
+  const syndicationParsedResponse: SyndicationResponse = JSON.parse(await syndicationResponse.text());
+  return syndicationParsedResponse.mediaDetails ?? syndicationParsedResponse.quoted_tweet?.mediaDetails;
+};
+
 const twitterAPIClient = async (params: ValidatedParams, env: Env): Promise<TwitterApiResult> => {
   let responseLog: TwitterGraphQLResponse | undefined;
   let status: number | undefined;
   try {
-    const twitterHeaders = await generateTwitterHeaders(env);
-    const twitterEndpoint = new URL("https://api.x.com/graphql/5GOHgZe-8U2j5sVHQzEm9A/TweetResultByRestId");
-    twitterEndpoint.search = new URLSearchParams({
-      "features": JSON.stringify(paramsFeatures),
-      "variables": JSON.stringify(paramsVariables(params.id))
-    }).toString();
-    const twitterResponse = await fetch(twitterEndpoint, {
-      headers: twitterHeaders
-    });
+    let tweetMedia: TweetMediaItem[] | undefined;
+    try {
+      const twitterHeaders = await generateTwitterHeaders(env);
+      const twitterEndpoint = new URL("https://api.x.com/graphql/5GOHgZe-8U2j5sVHQzEm9A/TweetResultByRestId");
+      twitterEndpoint.search = new URLSearchParams({
+        "features": JSON.stringify(paramsFeatures),
+        "variables": JSON.stringify(paramsVariables(params.id))
+      }).toString();
+      const twitterResponse = await fetch(twitterEndpoint, {
+        headers: twitterHeaders
+      });
 
-    if ([403, 429].includes(twitterResponse.status)) throw new Error("Rate Limit");
-    if ([404].includes(twitterResponse.status)) throw new Error("Blank");
+      if ([403, 429].includes(twitterResponse.status)) throw new Error("Rate Limit");
+      if ([404].includes(twitterResponse.status)) throw new Error("Blank");
 
-    const twitterParsedResponse: TwitterGraphQLResponse = JSON.parse(await twitterResponse.text());
-    responseLog = twitterParsedResponse;
-    status = twitterResponse.status;
-    const { tweetResultResult, tweetTypename } = validateTweetResponse(twitterParsedResponse);
-    const tweetMedia = extractMediaFromTweet(tweetResultResult, tweetTypename);
+      const twitterParsedResponse: TwitterGraphQLResponse = JSON.parse(await twitterResponse.text());
+      responseLog = twitterParsedResponse;
+      status = twitterResponse.status;
+      const { tweetResultResult, tweetTypename } = validateTweetResponse(twitterParsedResponse);
+      tweetMedia = extractMediaFromTweet(tweetResultResult, tweetTypename);
+    } catch (graphqlError) {
+      const graphqlErrorInstance = graphqlError instanceof Error ? graphqlError : new Error(String(graphqlError));
+      if (graphqlErrorInstance.message !== "Rate Limit") throw graphqlErrorInstance;
+      tweetMedia = await fetchSyndicationMedia(String(params.id));
+    }
     if (!tweetMedia) throw new Error("NoMedia");
 
     return jsonBuilder(tweetMedia, params.selector);
