@@ -1,5 +1,5 @@
 import worker from "@api/index";
-import { env } from "cloudflare:workers";
+import { createExecutionContext, env, waitOnExecutionContext } from "cloudflare:test";
 import { expect, test } from "vitest";
 
 import { latestVersion } from "@api/global-variables";
@@ -18,7 +18,9 @@ const dispatch = async (url: string, selector?: boolean | { selector: boolean })
     method: "POST",
     body: buildForm(url, selector)
   });
-  const response = await worker.fetch(request, env);
+  const ctx = createExecutionContext();
+  const response = await worker.fetch(request, env, ctx);
+  await waitOnExecutionContext(ctx);
   return response.json<JsonBuilderResult>();
 };
 
