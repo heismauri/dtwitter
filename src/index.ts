@@ -57,7 +57,7 @@ const formToObject = async (request: Request): Promise<ValidatedParams> => {
 };
 
 // Handle POST request
-const handlePostRequest = async (request: Request, env: Env): Promise<Response> => {
+const handlePostRequest = async (request: Request, env: Env, ctx: ExecutionContext): Promise<Response> => {
   if (env.MAINTENANCE === "true") {
     return jsonResponseBuilder(
       { error: "DTwitter is under maintenance. Find more at @heismauri on Twitter/X." },
@@ -68,7 +68,7 @@ const handlePostRequest = async (request: Request, env: Env): Promise<Response> 
   if (params.message) {
     return jsonResponseBuilder({ error: params.message }, { status: 400 });
   }
-  const twitterJSON = await twitterAPIClient(params, env);
+  const twitterJSON = await twitterAPIClient(params, env, ctx);
   // Check if the API gave any errors
   if (twitterJSON.status === "error") {
     switch (twitterJSON.error.message) {
@@ -113,9 +113,9 @@ const handlePostRequest = async (request: Request, env: Env): Promise<Response> 
 };
 
 export default {
-  fetch(request: Request, env: Env): Response | Promise<Response> {
+  fetch(request: Request, env: Env, ctx: ExecutionContext): Response | Promise<Response> {
     if (request.method === "POST") {
-      return handlePostRequest(request, env);
+      return handlePostRequest(request, env, ctx);
     }
     return env.ASSETS.fetch(request);
   }

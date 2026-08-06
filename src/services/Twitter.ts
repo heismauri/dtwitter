@@ -8,6 +8,8 @@ import type {
 import type { TwitterApiResult } from "@api/types/TwitterApiResult";
 import type { ValidatedParams } from "@api/types/ValidatedParams";
 
+const cacheTtlSeconds = 300;
+
 const paramsFeatures = {
   "c9s_tweet_anatomy_moderator_badge_enabled": true,
   "creator_subscriptions_tweet_preview_api_enabled": true,
@@ -142,7 +144,21 @@ const fetchSyndicationMedia = async (id: string): Promise<TweetMediaItem[] | und
   return syndicationParsedResponse.mediaDetails ?? syndicationParsedResponse.quoted_tweet?.mediaDetails;
 };
 
-const twitterAPIClient = async (params: ValidatedParams, env: Env): Promise<TwitterApiResult> => {
+const buildCacheKey = (id: string, selector: ValidatedParams["selector"]): Request => {
+  const cacheUrl = new URL(`https://dtwitter-cache.internal/tweet/${id}`);
+  cacheUrl.searchParams.set("selector", JSON.stringify(selector ?? false));
+  return new Request(cacheUrl.toString());
+};
+
+const twitterAPIClient = async (
+  params: ValidatedParams,
+  env: Env,
+  ctx: ExecutionContext
+): Promise<TwitterApiResult> => {
+  const cacheKey = buildCacheKey(String(params.id), params.selector);
+  const cachedResponse = await caches.default.match(cacheKey);
+  if (cachedResponse) return cachedResponse.json();
+
   let responseLog: TwitterGraphQLResponse | undefined;
   let status: number | undefined;
   try {
@@ -173,7 +189,19 @@ const twitterAPIClient = async (params: ValidatedParams, env: Env): Promise<Twit
     }
     if (!tweetMedia) throw new Error("NoMedia");
 
-    return jsonBuilder(tweetMedia, params.selector);
+    const result = jsonBuilder(tweetMedia, params.selector);
+    ctx.waitUntil(
+      caches.default.put(
+        cacheKey,
+        new Response(JSON.stringify(result), {
+          headers: {
+            "Content-Type": "application/json; charset=UTF-8",
+            "Cache-Control": `max-age=${cacheTtlSeconds}`
+          }
+        })
+      )
+    );
+    return result;
   } catch (caughtError) {
     const error = caughtError instanceof Error ? caughtError : new Error(String(caughtError));
     const knownErrors = ["Rate Limit", "Blank", "NotFound", "NoMedia", "Suspended", "Protected", "NsfwLoggedOut"];
