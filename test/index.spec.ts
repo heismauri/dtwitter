@@ -14,9 +14,13 @@ const buildForm = (url: string, selector: boolean | { selector: boolean } = fals
   return form;
 };
 
+let dispatchCount = 0;
+
 const dispatch = async (url: string, selector?: boolean | { selector: boolean }): Promise<JsonBuilderResult> => {
+  dispatchCount += 1;
   const request = new Request("http://localhost/", {
     method: "POST",
+    headers: { "CF-Connecting-IP": `203.0.113.${dispatchCount}` },
     body: buildForm(url, selector)
   });
   const ctx = createExecutionContext();
