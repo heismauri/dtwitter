@@ -26,6 +26,16 @@
     "enabled": true
   },
   "preview_urls": false,
+  "ratelimits": [
+    {
+      "name": "RATE_LIMITER",
+      "namespace_id": "1001",
+      "simple": {
+        "limit": 10,
+        "period": 10
+      }
+    }
+  ],
   "secrets": {
     "required": ["TOKEN"]
   },
